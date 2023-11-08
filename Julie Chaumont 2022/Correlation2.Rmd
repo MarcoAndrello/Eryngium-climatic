@@ -1,0 +1,2911 @@
+---
+title: "correlation"
+output: html_document
+---
+
+```{r}
+setwd("~/UGA/S8/Eryngium/i-Buttons OK/")
+library(here)
+```
+
+## Chargement fichiers
+
+```{r}
+files <- list.files(path = here("Files"))
+```
+
+```{r}
+nb_files <- length(files)
+data_names <- vector("list", length = nb_files)
+
+for (i in 1:nb_files) {
+  data_names[i] <- strsplit(files[i], split = ".csv")
+}
+
+for (i in 1:nb_files) {
+  assign(data_names[[i]],
+         csv2014 <-
+           read.csv(paste(here("Files", files[i])), header = F))
+}
+
+```
+
+## Création d'un gros dataframe pour faire des modifications
+
+```{r}
+donnees <-rbind("BER_Q1_2014.txt","BER_Q2_2014.txt","BER_Q3_2014.txt","BOU_Q1_2014.txt","BOU_Q2_2014.txt","DES_Q1_2014.txt","DES_Q2_2014.txt","DES_Q3_2014.txt","PRA_Q1_2014.txt","PRA_Q2_2014.txt","PRA_Q3_2014.txt","PRB_Q1_2014.txt","PRB_Q3_2014.txt","PRC_Q1_2014.txt","PRC_Q2_2014.txt","PRC_Q3_2014.txt","PRD_Q2_2014.txt","PRD_Q3_2014.txt","BER_Q1_2015.txt","BER_Q2_2015.txt","BER_Q3_2015.txt","BOU_Q1_2015.txt","BOU_Q2_2015.txt","DES_Q2_2015.txt","DES_Q3_2015.txt","PRA_Q1_2015.txt","PRA_Q2_2015.txt","PRA_Q3_2015.txt","PRB_Q1_2015.txt","PRB_Q3_2015.txt","PRC_Q1_2015.txt","PRC_Q2_2015.txt","PRC_Q3_2015.txt","PRD_Q2_2015.txt","PRD_Q3_2015.txt","BER_Q1_2016.txt","DES_Q2_2016.txt","DES_Q3_2016.txt","PRA_Q1_2016.txt","PRA_Q2_2016.txt","PRB_Q1_2016.txt","PRB_Q3_2016.txt","PRC_Q1_2016.txt","PRC_Q2_2016.txt","PRC_Q3_2016.txt","PRD_Q2_2016.txt","PRD_Q3_2016.txt","BER_Q1_2017.txt","BOU_Q1_2017.txt","BOU_Q2_2017.txt","DES_Q2_2017.txt","DES_Q3_2017.txt","PRA_Q1_2017.txt","PRA_Q2_2017.txt","PRB_Q1_2017.txt","PRB_Q3_2017.txt","PRC_Q1_2017.txt","PRC_Q2_2017.txt","PRC_Q3_2017.txt","PRD_Q2_2017.txt","BER_Q1_2018.txt","BOU_Q1_2018.txt","BOU_Q2_2018.txt","DES_Q2_2018.txt","DES_Q3_2018.txt","PRA_Q1_2018.txt","PRA_Q2_2018.txt","PRB_Q1_2018.txt","PRC_Q1_2018.txt","PRC_Q2_2018.txt","PRC_Q3_2018.txt","PRD_Q2_2018.txt","PRD_Q3_2018.txt","BER_Q1_2019.txt","BOU_Q1_2019.txt","BOU_Q2_2019.txt","DES_Q2_2019.txt","DES_Q3_2019.txt","PRA_Q1_2019.txt","PRA_Q2_2019.txt","PRC_Q3_2019.txt","PRD_Q3_2019.txt","BER_Q1_2020.txt","BER_Q2_2020.txt","BER_Q3_2020.txt","BOU_Q2_2020.txt","BOU_Q3_2020.txt","PRD_Q2_2020.txt",  source = "BER_Q1_2014.txt","BER_Q2_2014.txt","BER_Q3_2014.txt","BOU_Q1_2014.txt","BOU_Q2_2014.txt","DES_Q1_2014.txt","DES_Q2_2014.txt","DES_Q3_2014.txt","PRA_Q1_2014.txt","PRA_Q2_2014.txt","PRA_Q3_2014.txt","PRB_Q1_2014.txt","PRB_Q3_2014.txt","PRC_Q1_2014.txt","PRC_Q2_2014.txt","PRC_Q3_2014.txt","PRD_Q2_2014.txt","PRD_Q3_2014.txt","BER_Q1_2015.txt","BER_Q2_2015.txt","BER_Q3_2015.txt","BOU_Q1_2015.txt","BOU_Q2_2015.txt","DES_Q2_2015.txt","DES_Q3_2015.txt","PRA_Q1_2015.txt","PRA_Q2_2015.txt","PRA_Q3_2015.txt","PRB_Q1_2015.txt","PRB_Q3_2015.txt","PRC_Q1_2015.txt","PRC_Q2_2015.txt","PRC_Q3_2015.txt","PRD_Q2_2015.txt","PRD_Q3_2015.txt","BER_Q1_2016.txt","DES_Q2_2016.txt","DES_Q3_2016.txt","PRA_Q1_2016.txt","PRA_Q2_2016.txt","PRB_Q1_2016.txt","PRB_Q3_2016.txt","PRC_Q1_2016.txt","PRC_Q2_2016.txt","PRC_Q3_2016.txt","PRD_Q2_2016.txt","PRD_Q3_2016.txt","BER_Q1_2017.txt","BOU_Q1_2017.txt","BOU_Q2_2017.txt","DES_Q2_2017.txt","DES_Q3_2017.txt","PRA_Q1_2017.txt","PRA_Q2_2017.txt","PRB_Q1_2017.txt","PRB_Q3_2017.txt","PRC_Q1_2017.txt","PRC_Q2_2017.txt","PRC_Q3_2017.txt","PRD_Q2_2017.txt","BER_Q1_2018.txt","BOU_Q1_2018.txt","BOU_Q2_2018.txt","DES_Q2_2018.txt","DES_Q3_2018.txt","PRA_Q1_2018.txt","PRA_Q2_2018.txt","PRB_Q1_2018.txt","PRC_Q1_2018.txt","PRC_Q2_2018.txt","PRC_Q3_2018.txt","PRD_Q2_2018.txt","PRD_Q3_2018.txt","BER_Q1_2019.txt","BOU_Q1_2019.txt","BOU_Q2_2019.txt","DES_Q2_2019.txt","DES_Q3_2019.txt","PRA_Q1_2019.txt","PRA_Q2_2019.txt","PRC_Q3_2019.txt","PRD_Q3_2019.txt","BER_Q1_2020.txt","BER_Q2_2020.txt","BER_Q3_2020.txt","BOU_Q2_2020.txt","BOU_Q3_2020.txt","PRD_Q2_2020.txt")
+```
+
+```{r}
+donnees <- data.frame(donnees, source = "BER_Q1_2014.txt","BER_Q2_2014.txt","BER_Q3_2014.txt","BOU_Q1_2014.txt","BOU_Q2_2014.txt","DES_Q1_2014.txt","DES_Q2_2014.txt","DES_Q3_2014.txt","PRA_Q1_2014.txt","PRA_Q2_2014.txt","PRA_Q3_2014.txt","PRB_Q1_2014.txt","PRB_Q3_2014.txt","PRC_Q1_2014.txt","PRC_Q2_2014.txt","PRC_Q3_2014.txt","PRD_Q2_2014.txt","PRD_Q3_2014.txt","BER_Q1_2015.txt","BER_Q2_2015.txt","BER_Q3_2015.txt","BOU_Q1_2015.txt","BOU_Q2_2015.txt","DES_Q2_2015.txt","DES_Q3_2015.txt","PRA_Q1_2015.txt","PRA_Q2_2015.txt","PRA_Q3_2015.txt","PRB_Q1_2015.txt","PRB_Q3_2015.txt","PRC_Q1_2015.txt","PRC_Q2_2015.txt","PRC_Q3_2015.txt","PRD_Q2_2015.txt","PRD_Q3_2015.txt","BER_Q1_2016.txt","DES_Q2_2016.txt","DES_Q3_2016.txt","PRA_Q1_2016.txt","PRA_Q2_2016.txt","PRB_Q1_2016.txt","PRB_Q3_2016.txt","PRC_Q1_2016.txt","PRC_Q2_2016.txt","PRC_Q3_2016.txt","PRD_Q2_2016.txt","PRD_Q3_2016.txt","BER_Q1_2017.txt","BOU_Q1_2017.txt","BOU_Q2_2017.txt","DES_Q2_2017.txt","DES_Q3_2017.txt","PRA_Q1_2017.txt","PRA_Q2_2017.txt","PRB_Q1_2017.txt","PRB_Q3_2017.txt","PRC_Q1_2017.txt","PRC_Q2_2017.txt","PRC_Q3_2017.txt","PRD_Q2_2017.txt","BER_Q1_2018.txt","BOU_Q1_2018.txt","BOU_Q2_2018.txt","DES_Q2_2018.txt","DES_Q3_2018.txt","PRA_Q1_2018.txt","PRA_Q2_2018.txt","PRB_Q1_2018.txt","PRC_Q1_2018.txt","PRC_Q2_2018.txt","PRC_Q3_2018.txt","PRD_Q2_2018.txt","PRD_Q3_2018.txt","BER_Q1_2019.txt","BOU_Q1_2019.txt","BOU_Q2_2019.txt","DES_Q2_2019.txt","DES_Q3_2019.txt","PRA_Q1_2019.txt","PRA_Q2_2019.txt","PRC_Q3_2019.txt","PRD_Q3_2019.txt","BER_Q1_2020.txt","BER_Q2_2020.txt","BER_Q3_2020.txt","BOU_Q2_2020.txt","BOU_Q3_2020.txt","PRD_Q2_2020.txt")
+```
+
+```{r}
+library(gdata)
+```
+
+```{r}
+AppendMe <- function(dfNames) {
+  do.call(rbind, lapply(dfNames, function(x) {
+    cbind(get(x), source = x)
+  }))
+}
+```
+
+```{r}
+
+donnees <- AppendMe(c("BER_Q1_2014.txt","BER_Q2_2014.txt","BER_Q3_2014.txt","BOU_Q1_2014.txt","BOU_Q2_2014.txt","DES_Q1_2014.txt","DES_Q2_2014.txt","DES_Q3_2014.txt","PRA_Q1_2014.txt","PRA_Q2_2014.txt","PRA_Q3_2014.txt","PRB_Q1_2014.txt","PRB_Q3_2014.txt","PRC_Q1_2014.txt","PRC_Q2_2014.txt","PRC_Q3_2014.txt","PRD_Q2_2014.txt","PRD_Q3_2014.txt","BER_Q1_2015.txt","BER_Q2_2015.txt","BER_Q3_2015.txt","BOU_Q1_2015.txt","BOU_Q2_2015.txt","DES_Q2_2015.txt","DES_Q3_2015.txt","PRA_Q1_2015.txt","PRA_Q2_2015.txt","PRA_Q3_2015.txt","PRB_Q1_2015.txt","PRB_Q3_2015.txt","PRC_Q1_2015.txt","PRC_Q2_2015.txt","PRC_Q3_2015.txt","PRD_Q2_2015.txt","PRD_Q3_2015.txt","BER_Q1_2016.txt","DES_Q2_2016.txt","DES_Q3_2016.txt","PRA_Q1_2016.txt","PRA_Q2_2016.txt","PRB_Q1_2016.txt","PRB_Q3_2016.txt","PRC_Q1_2016.txt","PRC_Q2_2016.txt","PRC_Q3_2016.txt","PRD_Q2_2016.txt","PRD_Q3_2016.txt","BER_Q1_2017.txt","BOU_Q1_2017.txt","BOU_Q2_2017.txt","DES_Q2_2017.txt","DES_Q3_2017.txt","PRA_Q1_2017.txt","PRA_Q2_2017.txt","PRB_Q1_2017.txt","PRB_Q3_2017.txt","PRC_Q1_2017.txt","PRC_Q2_2017.txt","PRC_Q3_2017.txt","PRD_Q2_2017.txt","BER_Q1_2018.txt","BOU_Q1_2018.txt","BOU_Q2_2018.txt","DES_Q2_2018.txt","DES_Q3_2018.txt","PRA_Q1_2018.txt","PRA_Q2_2018.txt","PRB_Q1_2018.txt","PRC_Q1_2018.txt","PRC_Q2_2018.txt","PRC_Q3_2018.txt","PRD_Q2_2018.txt","PRD_Q3_2018.txt","BER_Q1_2019.txt","BOU_Q1_2019.txt","BOU_Q2_2019.txt","DES_Q2_2019.txt","DES_Q3_2019.txt","PRA_Q1_2019.txt","PRA_Q2_2019.txt","PRC_Q3_2019.txt","PRD_Q3_2019.txt","BER_Q1_2020.txt","BER_Q2_2020.txt","BER_Q3_2020.txt","BOU_Q2_2020.txt","BOU_Q3_2020.txt","PRD_Q2_2020.txt"))
+```
+
+```{r}
+p <- is.na.data.frame(donnees)
+```
+
+```{r}
+library(tidyr)
+```
+
+## Modifications
+# On réordonne les colonnes
+
+```{r}
+temp <- paste(donnees$V3, donnees$V4, sep = ",")
+
+donnees <- donnees %>% separate(V1, c("date", "heure"), sep = " ")
+
+donnees <- donnees[, -4]
+donnees <- donnees[, -4]
+
+donnees <- cbind(donnees, temp)
+```
+
+```{r}
+donnees$temp <- gsub(",", ".", as.character(donnees$temp))
+```
+
+```{r}
+donnees$temp <-
+  as.numeric(as.character(donnees$temp)) #ça donne des NA
+donnees[is.na(donnees)] <- -1 # toutes les données avec des NA correspondent aux données qui étaient de "-1"
+```
+
+```{r}
+sapply(donnees$temp, class)
+```
+
+
+```{r}
+p <- is.na.data.frame(donnees)
+```
+
+# On transforme les dates en dates dans R
+```{r}
+a <- as.factor(donnees$date)
+abis <-
+  strptime(a, format = "%d/%m/%y") #defining what is the original format of your date
+donnees$date <- as.Date(abis, format = "%d/%m/%y") #defining what is the desired format of your date
+```
+
+#On split les données: dataframes regroupés sous forme de liste
+```{r}
+donnees_abs_neige_test <- donnees
+donnees_abs_neige <- donnees
+donnees_split <- split(donnees, f = donnees$source)
+```
+
+#Modifications pour que les dates soient les mêmes
+PRB_Q1_2017
+PRB_Q3_2017
+PRC 2018 (Q2 + long)
+
+```{r}
+plot(donnees_split$PRC_Q1_2018.txt$date,
+     donnees_split$PRC_Q1_2018.txt$temp)
+plot(donnees_split$PRC_Q2_2018.txt$date,
+     donnees_split$PRC_Q2_2018.txt$temp)
+plot(donnees_split$PRC_Q3_2018.txt$date,
+     donnees_split$PRC_Q3_2018.txt$temp)
+dim(donnees_split$PRC_Q1_2018.txt)
+dim(donnees_split$PRC_Q2_2018.txt)
+dim(donnees_split$PRC_Q3_2018.txt)
+
+```
+
+#Autres modifications
+DES_Q3_2016: hors sol, on ne le garde pas
+PRC_Q3_2016: ne pas prendre en compte le 21/07/16 
+=> pareil pour 2017 et 2018 (12h et 15h c'est un peu plus élevé)
+DES_Q2 et Q3_2019: fin relevé à 15h
+
+```{r}
+donnees_split$DES_Q3_2019.txt<-donnees_split$DES_Q3_2019.txt[-8192,]
+donnees_split$DES_Q2_2019.txt<-donnees_split$DES_Q2_2019.txt[-8192,]
+```
+
+```{r}
+donnees_split$PRC_Q3_2016.txt<-donnees_split$PRC_Q3_2016.txt[-c(8189:8192),]
+donnees_split$PRC_Q3_2017.txt<-donnees_split$PRC_Q3_2017.txt[-c(5211:5218),]
+donnees_split$PRC_Q3_2018.txt<-donnees_split$PRC_Q3_2018.txt[-c(2309:2316),]
+```
+
+```{r}
+donnees_split<- donnees_split[names(donnees_split) != "DES_Q3_2016.txt"]
+```
+
+BER_Q2 remplacé le 13/07/2016  pas activés
+BER_Q3 remplacé le 13/07/2016  pas activés
+DES_Q1 remplacé le 15/07/2016  pas activés
+PRA_Q3 remplacé le 20/07/2016  pas activés
+PRB_Q2 remplacé le 20/07/2016  pas activés
+BOU_Q3 remplacé le 02/08/2017  pas activés
+PRD_Q3             28/07/2017  
+DES_Q1             10/07/2018  pas activé
+PRA_Q3             25/07/2018  defectueux
+PRB_Q3             25/07/2018  pas relevé
+(PRB_Q1             16/07/2019)
+(PRB_Q2             16/07/2019)  activé   ??
+(PRD_Q2             17/07/2019)
+
+
+```{r}
+donnees_split$PRD_Q3_2018.txt <- donnees_split$PRD_Q3_2018.txt[-c(1:5287),]
+donnees_split$PRD_Q3_2019.txt <- donnees_split$PRD_Q3_2019.txt[-c(1:5287),]
+
+```
+
+BER	Q1	2014	08/07/2013	15/07/2014	10/07/2013
+BER	Q2	2014	08/07/2013	15/07/2014	10/07/2013
+BER	Q3	2014	08/07/2013	15/07/2014	10/07/2013
+
+```{r}
+donnees_split$BER_Q1_2014.txt <- donnees_split$BER_Q1_2014.txt[-c(1:17),]
+donnees_split$BER_Q1_2015.txt <- donnees_split$BER_Q1_2015.txt[-c(1:17),]
+donnees_split$BER_Q2_2014.txt <- donnees_split$BER_Q2_2014.txt[-c(1:17),]
+donnees_split$BER_Q2_2015.txt <- donnees_split$BER_Q2_2015.txt[-c(1:17),]
+donnees_split$BER_Q3_2014.txt <- donnees_split$BER_Q3_2014.txt[-c(1:16),]
+donnees_split$BER_Q3_2015.txt <- donnees_split$BER_Q3_2015.txt[-c(1:16),]
+
+```
+2014 Boujurian Q1	BOU	Q1	2014	08/07/2013	30/07/2014	12/07/2013
+2014 Boujurian Q2	BOU	Q2	2014	08/07/2013	30/07/2014	12/07/2013
+
+2014 Deslioures Q1	DES	Q1	2014	08/07/2013	17/07/2014	12/07/2013
+2014 Deslioures Q2	DES	Q2	2014	08/07/2013	17/07/2014	12/07/2013
+2014 Deslioures Q3	DES	Q3	2014	08/07/2013	17/07/2014	12/07/2013
+
+2014 Pralognan A Q1	PraloA	Q1	2014	10/07/2013	31/07/2014	15/07/2013
+2014 Pralognan A Q2	PraloA	Q2	2014	10/07/2013	31/07/2014	15/07/2013
+2014 Pralognan A Q3	PraloA	Q3	2014	10/07/2013	31/07/2014	15/07/2013
+
+2014 Pralognan B Q1	PraloB	Q1	2014	10/07/2013	04/08/2014	18/07/2013
+2014 Pralognan B Q2	PraloB	Q2	2014	problème		18/07/2013
+2014 Pralognan B Q3	PraloB	Q3	2014	10/07/2013	04/08/2014	18/07/2013
+
+2014 Pralognan C Q1	PraloC	Q1	2014	10/07/2013	31/07/2014	18/07/2013
+2014 Pralognan C Q2	PraloC	Q2	2014	10/07/2013	31/07/2014	18/07/2013
+2014 Pralognan C Q3	PraloC	Q3	2014	10/07/2013	31/07/2014	18/07/2013
+
+2014 Pralognan D Q1	PraloD	Q1	2014	quadrat plus suivi		
+2014 Pralognan D Q2	PraloD	Q2	2014	10/07/2013	04/08/2014	14/08/2013
+2014 Pralognan D Q3	PraloD	Q3	2014	10/07/2013	04/08/2014	14/08/2013
+
+```{r}
+donnees_split$BOU_Q1_2014.txt <- donnees_split$BOU_Q1_2014.txt[-c(1:29),]
+donnees_split$BOU_Q1_2015.txt <- donnees_split$BOU_Q1_2015.txt[-c(1:29),]
+donnees_split$BOU_Q2_2014.txt <- donnees_split$BOU_Q2_2014.txt[-c(1:29),]
+donnees_split$BOU_Q2_2015.txt <- donnees_split$BOU_Q2_2015.txt[-c(1:29),]
+
+donnees_split$DES_Q1_2014.txt <- donnees_split$DES_Q1_2014.txt[-c(1:32),]
+donnees_split$DES_Q1_2015.txt <- donnees_split$DES_Q1_2015.txt[-c(1:32),]
+donnees_split$DES_Q2_2014.txt <- donnees_split$DES_Q2_2014.txt[-c(1:32),]
+donnees_split$DES_Q2_2015.txt <- donnees_split$DES_Q2_2015.txt[-c(1:32),]
+donnees_split$DES_Q3_2014.txt <- donnees_split$DES_Q3_2014.txt[-c(1:32),]
+donnees_split$DES_Q3_2015.txt <- donnees_split$DES_Q3_2015.txt[-c(1:32),]
+
+donnees_split$PRA_Q1_2014.txt <- donnees_split$PRA_Q1_2014.txt[-c(1:41),]
+donnees_split$PRA_Q1_2015.txt <- donnees_split$PRA_Q1_2015.txt[-c(1:41),]
+donnees_split$PRA_Q2_2014.txt <- donnees_split$PRA_Q2_2014.txt[-c(1:41),]
+donnees_split$PRA_Q2_2015.txt <- donnees_split$PRA_Q2_2015.txt[-c(1:41),]
+donnees_split$PRA_Q3_2014.txt <- donnees_split$PRA_Q3_2014.txt[-c(1:41),]
+donnees_split$PRA_Q3_2015.txt <- donnees_split$PRA_Q3_2015.txt[-c(1:41),]
+
+donnees_split$PRB_Q1_2014.txt <- donnees_split$PRB_Q1_2014.txt[-c(1:65),]
+donnees_split$PRB_Q1_2015.txt <- donnees_split$PRB_Q1_2015.txt[-c(1:65),]
+donnees_split$PRB_Q3_2014.txt <- donnees_split$PRB_Q3_2014.txt[-c(1:65),]
+donnees_split$PRB_Q3_2015.txt <- donnees_split$PRB_Q3_2015.txt[-c(1:65),]
+
+donnees_split$PRC_Q1_2014.txt <- donnees_split$PRC_Q1_2014.txt[-c(1:65),]
+donnees_split$PRC_Q1_2015.txt <- donnees_split$PRC_Q1_2015.txt[-c(1:65),]
+donnees_split$PRC_Q2_2014.txt <- donnees_split$PRC_Q2_2014.txt[-c(1:65),]
+donnees_split$PRC_Q2_2015.txt <- donnees_split$PRC_Q2_2015.txt[-c(1:65),]
+donnees_split$PRC_Q3_2014.txt <- donnees_split$PRC_Q3_2014.txt[-c(1:65),]
+donnees_split$PRC_Q3_2015.txt <- donnees_split$PRC_Q3_2015.txt[-c(1:65),]
+
+donnees_split$PRD_Q2_2014.txt <- donnees_split$PRD_Q2_2014.txt[-c(1:282),]
+donnees_split$PRD_Q2_2015.txt <- donnees_split$PRD_Q2_2015.txt[-c(1:282),]
+donnees_split$PRD_Q3_2014.txt <- donnees_split$PRD_Q3_2014.txt[-c(1:282),]
+donnees_split$PRD_Q3_2015.txt <- donnees_split$PRD_Q3_2015.txt[-c(1:282),]
+```
+
+## Corrélation
+
+```{r}
+debut <- substr(names(donnees_split),1,3)
+fin <- substr(names(donnees_split),8,11)
+```
+
+```{r}
+
+
+i = 1
+j = 1
+l = length(donnees_split)
+correlation <- c()
+nom_cor1 <- c()
+nom_cor2 <- c()
+df_correlation <- data.frame()
+
+for (i in 1:l) {
+  i = i
+  j = i + 1
+  rownames(donnees_split[[i]]) <- 1:nrow(donnees_split[[i]])
+  for (j in 1:l) {
+    if ((debut[i] == debut[j]) & (fin[i] == fin[j]) & fin[i] !="2020") {
+      rownames(donnees_split[[j]]) <- 1:nrow(donnees_split[[j]])
+      if (i != j & j > i) {
+        if (nrow(donnees_split[[i]]) == nrow(donnees_split[[j]])) {
+          correlation = c(
+            correlation,
+            cor(donnees_split[[i]]$temp, donnees_split[[j]]$temp, method = "spearman")
+          )
+          
+        }
+        
+        else if ((debut[i] == "BOU") & (fin[i] == "2019")) {
+          correlation = c(
+            correlation ,
+            cor(donnees_split[[i]]$temp, donnees_split[[j]][-1, ]$temp, method = "spearman")
+          )
+        }
+        else if ((debut[i] == "PRB") & (fin[i] == "2014")) {
+          correlation = c(
+            correlation ,
+            cor(donnees_split[[i]]$temp, donnees_split[[j]][-3057, ]$temp, method = "spearman")
+          )
+        }
+        else if ((debut[i] == "PRD") & (fin[i] == "2018")) {
+          correlation = c(
+            correlation ,
+            cor(donnees_split[[i]][-c(1:5287), ]$temp, donnees_split[[j]]$temp, method = "spearman")
+          )
+        }
+        else if ((debut[i] == "PRB") & (fin[i] == "2017")) {
+          correlation = c(
+            correlation ,
+            cor(
+              donnees_split[[i]][-c(1:7), ]$temp,
+              donnees_split[[j]][-c(8186:8192), ]$temp,
+              method = "spearman"
+            )
+          )
+        }
+        else if ((debut[i] == "PRC") & (fin[i] == "2016")) {
+          correlation = c(
+            correlation ,
+            cor(donnees_split[[i]][-c(8189:8192), ]$temp, donnees_split[[j]]$temp, method = "spearman")
+          )
+        }
+        else if ((debut[i] == "PRC") & (fin[i] == "2017")) {
+          correlation = c(
+            correlation ,
+            cor(donnees_split[[i]][-c(5211:5218), ]$temp, donnees_split[[j]]$temp, method = "spearman")
+          )
+        }
+        else if ((debut[i] == "PRC") & (fin[i] == "2018")) {
+          correlation = c(
+            correlation ,
+            cor(donnees_split[[i]][-c(2309:2316), ]$temp, donnees_split[[j]]$temp, method = "spearman")
+          )
+        }
+        
+        nom_cor1 <- c(nom_cor1, names(donnees_split[i]))
+        nom_cor2 <- c(nom_cor2, names(donnees_split[j]))
+        
+        df_correlation <- data.frame(nom_cor1, nom_cor2, correlation)
+        
+      }
+    }
+  }
+}
+
+```
+DES_Q1_2014: pas très bonne corrélation
+PRC_Q2_2018: pas très bonne corrélation
+
+#On regarde pourquoi on a des corrélations inférieures à 0,9
+
+```{r}
+plot(donnees_split$DES_Q1_2014.txt$date,donnees_split$DES_Q1_2014.txt$temp ) # ça monte pas aussi haut
+plot(donnees_split$DES_Q2_2014.txt$date,donnees_split$DES_Q2_2014.txt$temp )
+plot(donnees_split$DES_Q3_2014.txt$date,donnees_split$DES_Q3_2014.txt$temp )
+
+plot(donnees_split$PRC_Q1_2018.txt$date,donnees_split$PRC_Q1_2018.txt$temp ) 
+plot(donnees_split$PRC_Q2_2018.txt$date,donnees_split$PRC_Q2_2018.txt$temp ) #2018-08-02 19:36:01: températures négatives ?
+plot(donnees_split$PRC_Q3_2018.txt$date,donnees_split$PRC_Q3_2018.txt$temp ) # une température très haute en juillet 2016 ?
+
+plot(donnees_split$PRB_Q1_2016.txt$date,donnees_split$PRB_Q1_2016.txt$temp ) 
+plot(donnees_split$PRB_Q3_2016.txt$date,donnees_split$PRB_Q3_2016.txt$temp ) 
+plot(donnees_split$PRB_Q1_2017.txt$date,donnees_split$PRB_Q1_2017.txt$temp ) 
+plot(donnees_split$PRB_Q3_2017.txt$date,donnees_split$PRB_Q3_2017.txt$temp ) 
+plot(donnees_split$PRB_Q1_2018.txt$date,donnees_split$PRB_Q1_2018.txt$temp ) 
+max(donnees_split$PRB_Q1_2017.txt$temp)
+max(donnees_split$PRB_Q3_2017.txt$temp)
+max(donnees_split$PRB_Q1_2018.txt$temp)
+max(donnees_split$PRB_Q1_2016.txt$temp)
+max(donnees_split$PRB_Q3_2016.txt$temp)
+
+```
+
+## On regarde le capteur inconnu
+=> il a été hors sol donc bof
+
+on créé une colonne pour la température
+```{r}
+# temp <- paste(pralo_INCONNU_2017$V3, pralo_INCONNU_2017$V4, sep=",")
+```
+
+on sépare la 1ere colonne en 2
+```{r}
+library(tidyr)
+# PR_INC_2017 <- pralo_INCONNU_2017 %>% separate(V1, c("date", "heure"), sep=" ")
+
+```
+
+```{r}
+# PR_INC_2017 <- PR_INC_2017[,-4]
+# PR_INC_2017 <- PR_INC_2017[,-4]
+# 
+# PR_INC_2017<-cbind(PR_INC_2017,temp)
+# PR_INC_2017$temp <- gsub(",",".",as.character(PR_INC_2017$temp))
+# PR_INC_2017
+```
+
+```{r}
+# PR_INC_2017$temp <- as.numeric(as.character(PR_INC_2017$temp)) #ça donne des NA
+```
+
+```{r}
+# sapply(PR_INC_2017$temp,class)
+# PR_INC_2017$temp <- PR_INC_2017$temp /10
+```
+
+```{r}
+# a<-as.factor(PR_INC_2017$date)
+# abis<-strptime(a,format="%d/%m/%y") #defining what is the original format of your date
+# PR_INC_2017$date<-as.Date(abis,format="%d/%m/%y") #defining what is the desired format of your date
+```
+
+```{r}
+# cor(PR_INC_2017[-(5218:8192),]$temp, donnees_split$PRD_Q3_2016[-(1:2975),]$temp, method="spearman")
+# PR_INC_2017 
+# cor(PR_INC_2017 $temp, donnees_split$PRD_Q2_2017$temp)
+
+```
+
+## Pour les années où on a des trous dans les données
+
+BOU_Q1_2016 et BOU_Q2_2016: ça a été fauché donc pas de capteur présent cette année la, donc on ne peut pas prendre ceux de 2017.
+
+PRB_Q1_2019 (remplacé), Q2 et Q3 (pas relevé)
+PRC_Q1 et Q2 2019 (defectueux)
+PRD_Q2_2019 (disparu)
+
+## Test corrélation sans neige 
+
+```{r}
+
+donnees_abs_neige <- donnees_abs_neige[format(donnees_abs_neige$date,'%m') != "11"  , ]
+donnees_abs_neige <- donnees_abs_neige[format(donnees_abs_neige$date,'%m') != "12"  , ]
+donnees_abs_neige <- donnees_abs_neige[format(donnees_abs_neige$date,'%m') != "01"  , ]
+donnees_abs_neige <- donnees_abs_neige[format(donnees_abs_neige$date,'%m') != "02"  , ]
+donnees_abs_neige <- donnees_abs_neige[format(donnees_abs_neige$date,'%m') != "03"  , ]
+donnees_abs_neige <- donnees_abs_neige[format(donnees_abs_neige$date,'%m') != "04"  , ]
+
+
+```
+
+```{r}
+donnees_neige <- split(donnees_abs_neige,f= donnees_abs_neige$source)
+```
+
+#Autres modifications
+DES_Q3_2016: hors sol, on ne le garde pas
+PRC_Q3_2016: ne pas prendre en compte le 21/07/16 ?
+DES_Q2 et Q3_2019: fin relevé à 15h
+
+```{r}
+donnees_neige$DES_Q3_2019.txt<-donnees_neige$DES_Q3_2019.txt[-8192,]
+donnees_neige$DES_Q2_2019.txt<-donnees_neige$DES_Q2_2019.txt[-8192,]
+
+```
+
+```{r}
+donnees_neige$PRC_Q3_2016.txt<-donnees_neige$PRC_Q3_2016.txt[-c(8189:8192),]
+donnees_neige$PRC_Q3_2017.txt<-donnees_neige$PRC_Q3_2017.txt[-c(2309:2316),]
+donnees_neige$PRC_Q3_2018.txt<-donnees_neige$PRC_Q3_2018.txt[-c(854:861),]
+```
+
+```{r}
+donnees_neige<- donnees_neige[names(donnees_neige) != "DES_Q3_2016.txt"]
+```
+
+BER_Q2 remplacé le 13/07/2016  pas activés
+BER_Q3 remplacé le 13/07/2016  pas activés
+DES_Q1 remplacé le 15/07/2016  pas activés
+PRA_Q3 remplacé le 20/07/2016  pas activés
+PRB_Q2 remplacé le 20/07/2016  pas activés
+BOU_Q3 remplacé le 02/08/2017  pas activés
+PRD_Q3             28/07/2017  
+DES_Q1             10/07/2018  pas activé
+PRA_Q3             25/07/2018  defectueux
+PRB_Q3             25/07/2018  pas relevé
+(PRB_Q1             16/07/2019)
+(PRB_Q2             16/07/2019)  activé   
+(PRD_Q2             17/07/2019)
+
+
+```{r}
+donnees_neige$PRD_Q3_2018.txt <- donnees_neige$PRD_Q3_2018.txt[-c(1:(1933+452)),]
+donnees_neige$PRD_Q3_2019.txt <- donnees_neige$PRD_Q3_2019.txt[-c(1:(1933+452)),]
+
+```
+
+```{r}
+donnees_neige$BER_Q1_2014.txt <- donnees_neige$BER_Q1_2014.txt[-c(1:17),]
+donnees_neige$BER_Q1_2015.txt <- donnees_neige$BER_Q1_2015.txt[-c(1:17),]
+donnees_neige$BER_Q2_2014.txt <- donnees_neige$BER_Q2_2014.txt[-c(1:17),]
+donnees_neige$BER_Q2_2015.txt <- donnees_neige$BER_Q2_2015.txt[-c(1:17),]
+donnees_neige$BER_Q3_2014.txt <- donnees_neige$BER_Q3_2014.txt[-c(1:16),]
+donnees_neige$BER_Q3_2015.txt <- donnees_neige$BER_Q3_2015.txt[-c(1:16),]
+
+```
+2014 Boujurian Q1	BOU	Q1	2014	08/07/2013	30/07/2014	12/07/2013
+2014 Boujurian Q2	BOU	Q2	2014	08/07/2013	30/07/2014	12/07/2013
+
+2014 Deslioures Q1	DES	Q1	2014	08/07/2013	17/07/2014	12/07/2013
+2014 Deslioures Q2	DES	Q2	2014	08/07/2013	17/07/2014	12/07/2013
+2014 Deslioures Q3	DES	Q3	2014	08/07/2013	17/07/2014	12/07/2013
+
+2014 Pralognan A Q1	PraloA	Q1	2014	10/07/2013	31/07/2014	15/07/2013
+2014 Pralognan A Q2	PraloA	Q2	2014	10/07/2013	31/07/2014	15/07/2013
+2014 Pralognan A Q3	PraloA	Q3	2014	10/07/2013	31/07/2014	15/07/2013
+
+2014 Pralognan B Q1	PraloB	Q1	2014	10/07/2013	04/08/2014	18/07/2013
+2014 Pralognan B Q2	PraloB	Q2	2014	problème		18/07/2013
+2014 Pralognan B Q3	PraloB	Q3	2014	10/07/2013	04/08/2014	18/07/2013
+
+2014 Pralognan C Q1	PraloC	Q1	2014	10/07/2013	31/07/2014	18/07/2013
+2014 Pralognan C Q2	PraloC	Q2	2014	10/07/2013	31/07/2014	18/07/2013
+2014 Pralognan C Q3	PraloC	Q3	2014	10/07/2013	31/07/2014	18/07/2013
+
+2014 Pralognan D Q1	PraloD	Q1	2014	quadrat plus suivi		
+2014 Pralognan D Q2	PraloD	Q2	2014	10/07/2013	04/08/2014	14/08/2013
+2014 Pralognan D Q3	PraloD	Q3	2014	10/07/2013	04/08/2014	14/08/2013
+
+```{r}
+donnees_neige$BOU_Q1_2014.txt <- donnees_neige$BOU_Q1_2014.txt[-c(1:29),]
+donnees_neige$BOU_Q1_2015.txt <- donnees_neige$BOU_Q1_2015.txt[-c(1:29),]
+donnees_neige$BOU_Q2_2014.txt <- donnees_neige$BOU_Q2_2014.txt[-c(1:29),]
+donnees_neige$BOU_Q2_2015.txt <- donnees_neige$BOU_Q2_2015.txt[-c(1:29),]
+
+donnees_neige$DES_Q1_2014.txt <- donnees_neige$DES_Q1_2014.txt[-c(1:32),]
+donnees_neige$DES_Q1_2015.txt <- donnees_neige$DES_Q1_2015.txt[-c(1:32),]
+donnees_neige$DES_Q2_2014.txt <- donnees_neige$DES_Q2_2014.txt[-c(1:32),]
+donnees_neige$DES_Q2_2015.txt <- donnees_neige$DES_Q2_2015.txt[-c(1:32),]
+donnees_neige$DES_Q3_2014.txt <- donnees_neige$DES_Q3_2014.txt[-c(1:32),]
+donnees_neige$DES_Q3_2015.txt <- donnees_neige$DES_Q3_2015.txt[-c(1:32),]
+
+donnees_neige$PRA_Q1_2014.txt <- donnees_neige$PRA_Q1_2014.txt[-c(1:41),]
+donnees_neige$PRA_Q1_2015.txt <- donnees_neige$PRA_Q1_2015.txt[-c(1:41),]
+donnees_neige$PRA_Q2_2014.txt <- donnees_neige$PRA_Q2_2014.txt[-c(1:41),]
+donnees_neige$PRA_Q2_2015.txt <- donnees_neige$PRA_Q2_2015.txt[-c(1:41),]
+donnees_neige$PRA_Q3_2014.txt <- donnees_neige$PRA_Q3_2014.txt[-c(1:41),]
+donnees_neige$PRA_Q3_2015.txt <- donnees_neige$PRA_Q3_2015.txt[-c(1:41),]
+
+donnees_neige$PRB_Q1_2014.txt <- donnees_neige$PRB_Q1_2014.txt[-c(1:65),]
+donnees_neige$PRB_Q1_2015.txt <- donnees_neige$PRB_Q1_2015.txt[-c(1:65),]
+donnees_neige$PRB_Q3_2014.txt <- donnees_neige$PRB_Q3_2014.txt[-c(1:65),]
+donnees_neige$PRB_Q3_2015.txt <- donnees_neige$PRB_Q3_2015.txt[-c(1:65),]
+
+donnees_neige$PRC_Q1_2014.txt <- donnees_neige$PRC_Q1_2014.txt[-c(1:65),]
+donnees_neige$PRC_Q1_2015.txt <- donnees_neige$PRC_Q1_2015.txt[-c(1:65),]
+donnees_neige$PRC_Q2_2014.txt <- donnees_neige$PRC_Q2_2014.txt[-c(1:65),]
+donnees_neige$PRC_Q2_2015.txt <- donnees_neige$PRC_Q2_2015.txt[-c(1:65),]
+donnees_neige$PRC_Q3_2014.txt <- donnees_neige$PRC_Q3_2014.txt[-c(1:65),]
+donnees_neige$PRC_Q3_2015.txt <- donnees_neige$PRC_Q3_2015.txt[-c(1:65),]
+
+donnees_neige$PRD_Q2_2014.txt <- donnees_neige$PRD_Q2_2014.txt[-c(1:282),]
+donnees_neige$PRD_Q2_2015.txt <- donnees_neige$PRD_Q2_2015.txt[-c(1:282),]
+donnees_neige$PRD_Q3_2014.txt <- donnees_neige$PRD_Q3_2014.txt[-c(1:282),]
+donnees_neige$PRD_Q3_2015.txt <- donnees_neige$PRD_Q3_2015.txt[-c(1:282),]
+```
+
+```{r}
+debut <- substr(names(donnees_neige), 1, 3)
+fin <- substr(names(donnees_neige), 8, 11)
+i = 1
+j = 1
+l = length(donnees_neige)
+correlation_n <- c()
+
+nom_cor3 <- c()
+nom_cor4 <- c()
+df_correlation_n <- c()
+
+for (i in 1:l) {
+  i = i
+  j = i + 1
+  rownames(donnees_neige[[i]]) <- 1:nrow(donnees_neige[[i]])
+  for (j in 1:l) {
+    rownames(donnees_neige[[j]]) <- 1:nrow(donnees_neige[[j]])
+    if ((debut[i] == debut[j]) &
+        (fin[i] == fin[j]) &
+        (debut[i] != "PRC") &
+        (fin[i] != "2017") & (fin[i] != "2020")) {
+      # bug avec PRC_Q1 et Q2 2017
+      if (i != j & j > i) {
+        if (nrow(donnees_neige[[i]]) == nrow(donnees_neige[[j]])) {
+          correlation_n = c(
+            correlation_n,
+            cor(donnees_neige[[i]]$temp, donnees_neige[[j]]$temp, method = "spearman")
+          )
+          
+        }
+        
+        else if ((debut[i] == "BOU") & (fin[i] == "2019")) {
+          correlation_n = c(
+            correlation_n ,
+            cor(donnees_neige[[i]]$temp, donnees_neige[[j]][-1, ]$temp, method = "spearman")
+          )
+        }
+        else if ((debut[i] == "PRB") & (fin[i] == "2014")) {
+          correlation_n = c(
+            correlation_n ,
+            cor(donnees_neige[[i]]$temp, donnees_neige[[j]][-1361, ]$temp, method = "spearman")
+          )
+        }
+        else if ((debut[i] == "PRD") & (fin[i] == "2018")) {
+          correlation_n = c(
+            correlation_n ,
+            cor(donnees_neige[[i]][-c(1:(1933 + 452)), ]$temp, donnees_neige[[j]]$temp, method = "spearman")
+          )
+        }
+        else if ((debut[i] == "PRB") & (fin[i] == "2017")) {
+          correlation_n = c(
+            correlation ,
+            cor(
+              donnees_neige[[i]][-c(1:7), ]$temp,
+              donnees_neige[[j]][-c(3837:3843), ]$temp,
+              method = "spearman"
+            )
+          )
+        }
+        else if ((debut[i] == "PRC") & (fin[i] == "2016")) {
+          correlation_n = c(
+            correlation ,
+            cor(donnees_neige[[i]][-c(8189:8192), ]$temp, donnees_neige[[j]]$temp, method = "spearman")
+          )
+        }
+        else if ((debut[i] == "PRC") & (fin[i] == "2017")) {
+          correlation_n = c(
+            correlation ,
+            cor(donnees_neige[[i]][-c(2309:2316), ]$temp, donnees_neige[[j]]$temp, method = "spearman")
+          )
+        }
+        else if ((debut[i] == "PRC") & (fin[i] == "2018")) {
+          
+        }
+        
+        nom_cor3 <- c(nom_cor3, names(donnees_neige[i]))
+        nom_cor4 <- c(nom_cor4, names(donnees_neige[j]))
+        df_correlation_n <- data.frame(nom_cor3, nom_cor4, correlation_n)
+        
+      }
+    }
+  }
+}
+
+```
+
+```{r}
+plot(donnees_neige$PRA_Q1_2018.txt$date,donnees_neige$PRA_Q1_2018.txt$temp)
+plot(donnees_neige$PRA_Q2_2018.txt$date,donnees_neige$PRA_Q2_2018.txt$temp) # ça tire vers 5°C en 2017
+
+plot(donnees_neige$PRA_Q1_2017.txt$date,donnees_neige$PRA_Q1_2017.txt$temp)
+plot(donnees_neige$PRA_Q2_2017.txt$date,donnees_neige$PRA_Q2_2017.txt$temp) # ça tire vers 5°C en 2017
+
+plot(donnees_neige$PRB_Q3_2017.txt$date,donnees_neige$PRB_Q3_2017.txt$temp) # les données ont tendance à être plus hautes
+plot(donnees_neige$PRB_Q1_2017.txt$date,donnees_neige$PRB_Q1_2017.txt$temp)
+plot(donnees_neige$PRB_Q3_2016.txt$date,donnees_neige$PRB_Q3_2016.txt$temp) # les données ont tendance à être plus hautes
+plot(donnees_neige$PRB_Q1_2016.txt$date,donnees_neige$PRB_Q1_2016.txt$temp)
+max(donnees_neige$PRB_Q1_2017.txt$temp)
+max(donnees_neige$PRB_Q3_2017.txt$temp)
+```
+
+## Création de df avec toutes les données de 2013 à 2019
+```{r}
+BER <- rbind(donnees_split$BER_Q1_2014.txt,donnees_split$BER_Q1_2015.txt,donnees_split$BER_Q1_2016.txt,donnees_split$BER_Q1_2017.txt,donnees_split$BER_Q1_2018.txt,donnees_split$BER_Q1_2019.txt, donnees_split$BER_Q1_2020.txt)
+BER <- BER[!duplicated(BER[c("date", "heure")]),]
+```
+
+```{r}
+BOU<- rbind(donnees_split$BOU_Q1_2014.txt,donnees_split$BOU_Q1_2015.txt,donnees_split$BOU_Q1_2017.txt,donnees_split$BOU_Q1_2018.txt,donnees_split$BOU_Q1_2019.txt, donnees_split$BOU_Q2_2020.txt)
+
+#new_uniq will contain unique dataset without the duplicates. 
+BOU <- BOU[!duplicated(BOU[c("date", "heure")]),]
+```
+
+```{r}
+DES<- rbind(donnees_split$DES_Q2_2014.txt,donnees_split$DES_Q2_2015.txt,donnees_split$DES_Q2_2016.txt,donnees_split$DES_Q2_2017.txt,donnees_split$DES_Q2_2018.txt,donnees_split$DES_Q2_2019.txt)
+
+#new_uniq will contain unique dataset without the duplicates. 
+DES <- DES[!duplicated(DES[c("date", "heure")]),]
+```
+
+```{r}
+PRA<- rbind(donnees_split$PRA_Q1_2014.txt,donnees_split$PRA_Q1_2015.txt,donnees_split$PRA_Q1_2016.txt,donnees_split$PRA_Q1_2017.txt,donnees_split$PRA_Q1_2018.txt,donnees_split$PRA_Q1_2019.txt)
+
+#new_uniq will contain unique dataset without the duplicates. 
+PRA<- PRA[!duplicated(PRA[c("date", "heure")]),]
+```
+
+```{r}
+PRB<- rbind(donnees_split$PRB_Q1_2014.txt,donnees_split$PRB_Q1_2015.txt,donnees_split$PRB_Q1_2016.txt,donnees_split$PRB_Q1_2017.txt,donnees_split$PRB_Q1_2018.txt)
+
+#new_uniq will contain unique dataset without the duplicates. 
+PRB<- PRB[!duplicated(PRB[c("date", "heure")]),]
+```
+
+```{r}
+PRC<- rbind(donnees_split$PRC_Q3_2014.txt,donnees_split$PRC_Q3_2015.txt,donnees_split$PRC_Q3_2016.txt,donnees_split$PRC_Q3_2017.txt,donnees_split$PRC_Q3_2018.txt,donnees_split$PRC_Q3_2019.txt)
+
+#new_uniq will contain unique dataset without the duplicates. 
+PRC<- PRC[!duplicated(PRC[c("date", "heure")]),]
+```
+
+```{r}
+PRD<- rbind(donnees_split$PRD_Q2_2014.txt,donnees_split$PRD_Q2_2015.txt,donnees_split$PRD_Q2_2016.txt,donnees_split$PRD_Q2_2017.txt,donnees_split$PRD_Q2_2018.txt,donnees_split$PRD_Q3_2019.txt ,donnees_split$PRD_Q2_2020.txt)
+
+#new_uniq will contain unique dataset without the duplicates. 
+PRD<- PRD[!duplicated(PRD[c("date", "heure")]),]
+
+```
+
+```{r}
+plot(DES$date, DES$temp)
+plot(BOU$date, BOU$temp)
+```
+
+
+
+## Estimer période d'enneigement par site
+
+```{r}
+plot(BER$date,BER$temp)
+plot(BOU$date,BOU$temp)
+plot(DES$date,DES$temp)
+plot(PRA$date,PRA$temp)
+plot(PRB$date,PRB$temp)
+plot(PRC$date,PRC$temp)
+plot(PRD$date,PRD$temp)
+```
+
+```{r}
+rownames(BER) <- 1:nrow(BER)
+rownames(BOU) <- 1:nrow(BOU)
+rownames(DES) <- 1:nrow(DES)
+rownames(PRA) <- 1:nrow(PRA)
+rownames(PRB) <- 1:nrow(PRB)
+rownames(PRC) <- 1:nrow(PRC)
+rownames(PRD) <- 1:nrow(PRD)
+```
+
+
+
+```{r}
+BER_n <- BER
+BER_n <- BER_n[-c(18492:nrow(BER_n)),]
+BER_n <- BER_n[-c(15628:16890),]
+BER_n <- BER_n[-c(12652:14050),]
+BER_n <- BER_n[-c(9708:10938),]
+BER_n <- BER_n[-c(6780:8066),]
+BER_n <- BER_n[-c(3860:5098),]
+BER_n <- BER_n[-c(980:2282),]
+```
+
+
+```{r}
+BOU_n <- BOU
+BOU_n <- BOU_n[-c(18479:nrow(BOU)),]
+BOU_n <- BOU_n[-c(15615:16821),]
+BOU_n <- BOU_n[-c(12655:14077),]
+BOU_n <- BOU_n[-c(9630:10901),]
+BOU_n <- BOU_n[-c(6767:8029),]
+BOU_n <- BOU_n[-c(3775:5077),]
+BOU_n <- BOU_n[-c(975:2269),]
+```
+
+```{r}
+DES_n <- DES
+DES_n <- DES_n[-c(15605:16979),]
+DES_n <- DES_n[-c(12621:14251),]
+DES_n <- DES_n[-c(9508:10939),]
+DES_n <- DES_n[-c(6709:8083),]
+DES_n <- DES_n[-c(3773:5171),]
+DES_n <- DES_n[-c(965:2747),]
+```
+
+```{r}
+PRA_n <- PRA
+PRA_n <- PRA_n[-c(15621:16676),]
+PRA_n <- PRA_n[-c(12597:13923),]
+PRA_n <- PRA_n[-c(9677:10708),]
+PRA_n <- PRA_n[-c(6869:7955),]
+PRA_n <- PRA_n[-c(4069:5051),]
+PRA_n <- PRA_n[-c(933:2060),]
+```
+
+```{r}
+PRB_n <- PRB
+PRB_n <- PRB_n[-c(12573:13963),]
+PRB_n <- PRB_n[-c(9653:10875),]
+PRB_n <- PRB_n[-c(6845:8043),]
+PRB_n <- PRB_n[-c(4045:5043),]
+PRB_n <- PRB_n[-c(869:2075),]
+```
+
+```{r}
+PRC_n <- PRC
+PRC_n <- PRC_n[-c(15573:16843),]
+PRC_n <- PRC_n[-c(12557:13995),]
+PRC_n <- PRC_n[-c(9645:10875),]
+PRC_n <- PRC_n[-c(6845:8059),]
+PRC_n <- PRC_n[-c(3877:4828),]
+PRC_n <- PRC_n[-c(917:2155),]
+```
+
+```{r}
+PRD_n <- PRD
+PRD_n <- PRD_n[-c(18188:nrow(PRD)),]
+PRD_n <- PRD_n[-c(15380:16674),]
+PRD_n <- PRD_n[-c(12356:13810),]
+PRD_n <- PRD_n[-c(9444:10523),]
+PRD_n <- PRD_n[-c(6636:7818),]
+PRD_n <- PRD_n[-c(3788:4667),]
+PRD_n <- PRD_n[-c(668:1819),]
+```
+
+```{r}
+plot(BER_n$date,BER_n$temp)
+plot(BOU_n$date,BOU_n$temp)
+plot(DES_n$date,DES_n$temp)
+plot(PRA_n$date,PRA_n$temp)
+plot(PRB_n$date,PRB_n$temp)
+plot(PRC_n$date,PRC_n$temp)
+plot(PRD_n$date,PRD_n$temp)
+```
+
+
+## Variables bioclimatiques
+
+#température annuelle moyenne
+
+la c'est de janvier à décembre : bon ?
+```{r}
+data_milieu <- list(BER_n, BOU_n, DES_n, PRA_n, PRB_n, PRC_n, PRD_n)
+data_annee <- c()
+moyenne <- c()
+
+annee <- c("2013", "2014", "2015", "2016", "2017", "2018", "2019")
+i = 1
+j = 1
+
+for (i in 1:7) {
+  for (j in 1:7) {
+    data_annee <-
+      data_milieu[[i]][format(data_milieu[[i]]$date, "%Y") == annee[j], ] #stock les données uniquement de l'année j
+    print(i)
+    print(j)
+    moyenne <-
+      c(moyenne, mean(data_annee[data_annee$temp > 0 , 'temp'])) # on prend 0 ou 0.5 ?
+  }
+}
+```
+
+
+#tableau des moyennes annuelles
+```{r}
+tab_moy_an <- matrix(moyenne, ncol=7, nrow=7)
+colnames(tab_moy_an) <- c('BER', 'BOU', 'DES', 'PRA', 'PRB', 'PRC', 'PRD')
+rownames(tab_moy_an) <- c('2013', '2014', '2015', '2016', '2017', '2018', '2019')
+tab_moy_an <- as.table(tab_moy_an)
+tab_moy_an
+```
+
+#saisonnalité
+==> pour ça il nous faut la température moyenne pour chaque mois
+
+# moyennes mensuelles et annuelles
+```{r}
+data_milieu <-
+  list(
+    BER = BER_n,
+    BOU = BOU_n,
+    DES = DES_n,
+    PRA = PRA_n,
+    PRB = PRB_n,
+    PRC = PRC_n,
+    PRD = PRD_n
+  )
+mois <-
+  c("03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10",
+    "11",
+    "12")
+annee <- c("2013", "2014", "2015", "2016", "2017", "2018", "2019")
+
+l = length(data_milieu)
+m <- length(mois)
+n <- length(annee)
+
+data_mois <- c()
+
+nom_df <- substr(names(data_milieu), 1, 3)
+
+
+BER_df <- data.frame()
+BOU_df <- data.frame()
+DES_df <- data.frame()
+PRA_df <- data.frame()
+PRB_df <- data.frame()
+PRC_df <- data.frame()
+PRD_df <- data.frame()
+
+```
+
+
+```{r}
+j = 1
+i = 1
+c = 0
+an_mois <- c()
+data_annee <- c()
+moyenne_an <- c()
+
+for (i in 1:l) {
+  moy <- c()
+  minimum <- c()
+  maximum <- c()
+  year <- c()
+  month <- c()
+  annee_capt <- c()
+  j = 1
+  for (j in 1:n) {
+    k = 1
+    for (k in 1:m) {
+      rownames(data_milieu[[i]]) <- 1:nrow(data_milieu[[i]])
+      
+      an_mois <- capture.output(cat(annee[j], mois[k], sep = ""))
+      
+      data_mois <-
+        data_milieu[[i]][format(data_milieu[[i]]$date, "%Y%m") == an_mois,] #stock les données uniquement du mois j
+      
+      data_annee <- c(data_annee,data_mois$temp)
+      moy <- c(moy, mean(data_mois$temp))
+      minimum <- c(minimum, min(data_mois$temp))
+      maximum <- c(maximum, max(data_mois$temp))
+      month <- c(month, mois[k])
+      year <- c(year, annee[j])
+      data_mois <- c()
+      # print(moy)
+      
+      if (nom_df[i] == "BER") {
+        BER_df <- data.frame(month, year, moy, minimum, maximum)
+      }
+      if (nom_df[i] == "BOU") {
+        BOU_df <- data.frame(month, year, moy, minimum, maximum)
+      }
+      if (nom_df[i] == "DES") {
+        DES_df <- data.frame(month, year, moy, minimum, maximum)
+      }
+      if (nom_df[i] == "PRA") {
+        PRA_df <- data.frame(month, year, moy, minimum, maximum)
+      }
+      if (nom_df[i] == "PRB") {
+        PRB_df <- data.frame(month, year, moy, minimum, maximum)
+      }
+      if (nom_df[i] == "PRC") {
+        PRC_df <- data.frame(month, year, moy, minimum, maximum)
+      }
+      if (nom_df[i] == "PRD") {
+        PRD_df <- data.frame(month, year, moy, minimum, maximum)
+      }
+    }
+    moyenne_an <-
+      c(moyenne_an, mean(data_annee[data_annee >0])) 
+    data_annee <- c()
+  }
+}
+
+BER_df <- na.omit(BER_df)
+BOU_df <- na.omit(BOU_df)
+DES_df <- na.omit(DES_df)
+PRA_df <- na.omit(PRA_df)
+PRB_df <- na.omit(PRB_df)
+PRC_df <- na.omit(PRC_df)
+PRD_df <- na.omit(PRD_df)
+list_mois <-
+  list(
+    BER_df = BER_df,
+    BOU_df = BOU_df,
+    DES_df = DES_df,
+    PRA_df = PRA_df,
+    PRB_df = PRB_df,
+    PRC_df = PRC_df,
+    PRD_df = PRD_df
+  )
+
+```
+
+
+```{r}
+tab_moy_an <- matrix(moyenne_an, ncol=7, nrow=7)
+colnames(tab_moy_an) <- c('BER', 'BOU', 'DES', 'PRA', 'PRB', 'PRC', 'PRD')
+rownames(tab_moy_an) <- c('2013', '2014', '2015', '2016', '2017', '2018', '2019')
+tab_moy_an <-as.data.frame.matrix(tab_moy_an)
+```
+
+
+#test pour les moyennes mensuelles
+```{r}
+# test pour les années
+# wilcox.test(tab_moy_an[2,],tab_moy_an[3,])
+# wilcox.test(tab_moy_an[2,],tab_moy_an[4,])  # significatif
+# wilcox.test(tab_moy_an[2,],tab_moy_an[5,])
+# wilcox.test(tab_moy_an[2,],tab_moy_an[6,])  
+# wilcox.test(tab_moy_an[2,],tab_moy_an[7,])  # significatif  2014/2019
+# 
+# wilcox.test(tab_moy_an[3,],tab_moy_an[4,])
+# wilcox.test(tab_moy_an[3,],tab_moy_an[5,])
+# wilcox.test(tab_moy_an[3,],tab_moy_an[6,])
+# wilcox.test(tab_moy_an[3,],tab_moy_an[7,])  # significatif  2015/2019
+# 
+# wilcox.test(tab_moy_an[4,],tab_moy_an[5,])
+# wilcox.test(tab_moy_an[4,],tab_moy_an[6,])
+# wilcox.test(tab_moy_an[4,],tab_moy_an[7,])  # significatif  2016/2019
+# 
+# wilcox.test(tab_moy_an[5,],tab_moy_an[6,])
+# wilcox.test(tab_moy_an[5,],tab_moy_an[7,])  # significatif  2017/2019
+# 
+# wilcox.test(tab_moy_an[6,],tab_moy_an[7,])  # significatif  2018/2019
+# 
+# # test pour les sites
+# wilcox.test(tab_moy_an[,1],tab_moy_an[,2])
+# wilcox.test(tab_moy_an[,1],tab_moy_an[,3])
+# wilcox.test(tab_moy_an[,1],tab_moy_an[,4])
+# wilcox.test(tab_moy_an[,1],tab_moy_an[,5])
+# wilcox.test(tab_moy_an[,1],tab_moy_an[,6])  
+# wilcox.test(tab_moy_an[,1],tab_moy_an[,7])  # significatif  BER/PRD
+# 
+# wilcox.test(tab_moy_an[,2],tab_moy_an[,3])
+# wilcox.test(tab_moy_an[,2],tab_moy_an[,4])
+# wilcox.test(tab_moy_an[,2],tab_moy_an[,5])
+# wilcox.test(tab_moy_an[,2],tab_moy_an[,6])  # significatif  BOU/PRC
+# wilcox.test(tab_moy_an[,2],tab_moy_an[,7])  # significatif  BOU/PRD
+# 
+# wilcox.test(tab_moy_an[,3],tab_moy_an[,4])  # significatif  DES/PRA
+# wilcox.test(tab_moy_an[,3],tab_moy_an[,5])  # significatif  DES/PRB
+# wilcox.test(tab_moy_an[,3],tab_moy_an[,6])  # significatif  DES/PRC
+# wilcox.test(tab_moy_an[,3],tab_moy_an[,7])  # significatif  DES/PRD
+# 
+# wilcox.test(tab_moy_an[,4],tab_moy_an[,5])
+# wilcox.test(tab_moy_an[,4],tab_moy_an[,6])
+# wilcox.test(tab_moy_an[,4],tab_moy_an[,7])  
+# 
+# wilcox.test(tab_moy_an[,5],tab_moy_an[,6])
+# wilcox.test(tab_moy_an[,5],tab_moy_an[,7])  
+# 
+# wilcox.test(tab_moy_an[,6],tab_moy_an[,7])  
+```
+
+
+Calculer les sd 
+Bio 4 = SD{Tavg1, ..., Tavg12}
+enlever les mois pas complets
+
+
+```{r}
+l <- length(list_mois)
+data_sd <- data.frame()
+nom_annee <- substr(list_mois[[i]]$year, 3, 4)
+k <-
+  c(
+    nrow(list_mois[[1]]),
+    nrow(list_mois[[2]]),
+    nrow(list_mois[[3]]),
+    nrow(list_mois[[4]]),
+    nrow(list_mois[[5]]),
+    nrow(list_mois[[6]]),
+    nrow(list_mois[[7]])
+  )
+
+ecart_type13 <- c()
+ecart_type14 <- c()
+ecart_type15 <- c()
+ecart_type16 <- c()
+ecart_type17 <- c()
+ecart_type18 <- c()
+ecart_type19 <- c()
+
+data_sd13 <- c()
+  data_sd14 <- c()
+  data_sd15 <- c()
+  data_sd16 <- c()
+  data_sd17 <- c()
+
+i = 1
+j = 1
+for (i in 1:l) {
+  data_sd13 <- c()
+  data_sd14 <- c()
+  data_sd15 <- c()
+  data_sd16 <- c()
+  data_sd17 <- c()
+  rownames(list_mois[[i]]) <- 1:nrow(list_mois[[i]])
+  for (j in 1:k[i]) {
+      if (is.na(list_mois[[i]]$year[j + 1]) == F & list_mois[[i]]$year[j] == list_mois[[i]]$year[j + 1]) {
+    
+        if (list_mois[[i]]$year[j] == "2013") {
+          data_sd13 <- c(data_sd13, list_mois[[i]]$moy[j])
+        }
+        if (list_mois[[i]]$year[j] == "2014") {
+          data_sd14 <- c(data_sd14, list_mois[[i]]$moy[j])
+        }
+        if (list_mois[[i]]$year[j] == "2015") {
+          data_sd15 <- c(data_sd15, list_mois[[i]]$moy[j])
+        }
+        if (list_mois[[i]]$year[j] == "2016") {
+          data_sd16 <- c(data_sd16, list_mois[[i]]$moy[j])
+        }
+        if (list_mois[[i]]$year[j] == "2017") {
+          data_sd17 <- c(data_sd17, list_mois[[i]]$moy[j])
+        }
+      }
+      
+      else {
+        if (list_mois[[i]]$year[j] == "2013") {
+          data_sd13 <- c(data_sd13, list_mois[[i]]$moy[j])
+          ecart_type13 <- c(ecart_type13, sd(data_sd13) * 100)
+        }
+        if (list_mois[[i]]$year[j] == "2014") {
+          data_sd14 <- c(data_sd14, list_mois[[i]]$moy[j])
+          ecart_type14 <- c(ecart_type14, sd(data_sd14) * 100)
+        }
+        if (list_mois[[i]]$year[j] == "2015") {
+          data_sd15 <- c(data_sd15, list_mois[[i]]$moy[j])
+          ecart_type15 <- c(ecart_type15, sd(data_sd15) * 100)
+        }
+        if (list_mois[[i]]$year[j] == "2016") {
+          data_sd16 <- c(data_sd16, list_mois[[i]]$moy[j])
+          ecart_type16 <- c(ecart_type16, sd(data_sd16) * 100)
+          
+        }
+        if (list_mois[[i]]$year[j] == "2017") {
+          data_sd17 <- c(data_sd17, list_mois[[i]]$moy[j])
+          ecart_type17 <- c(ecart_type17, sd(data_sd17) * 100)
+         
+        }
+      
+      }
+  }
+}
+```
+
+```{r}
+milieu <- c("BER", "BOU", "DES", "PRA", "PRB", "PRC", "PRD")
+data_sd <-
+  cbind(
+    milieu,
+    ecart_type13,
+    ecart_type14,
+    ecart_type15,
+    ecart_type16,
+    ecart_type17
+  )
+
+data_sd <- as.data.frame(data_sd)
+rownames(data_sd) <- data_sd[,1]
+data_sd <- data_sd[,-1]
+```
+
+# tests pour saisonnalité
+année 2014 mois de saisonnalité
+```{r}
+wilcox.test(ecart_type14, ecart_type15)  #
+wilcox.test(ecart_type14, ecart_type16)  #
+wilcox.test(ecart_type14, ecart_type17)  #
+
+
+wilcox.test(ecart_type15, ecart_type16)
+wilcox.test(ecart_type15, ecart_type17)
+
+wilcox.test(ecart_type16, ecart_type17)
+
+```
+
+```{r}
+# comparaison par site
+data_sd$ecart_type13 <-as.numeric(data_sd$ecart_type13)
+data_sd$ecart_type14 <-as.numeric(data_sd$ecart_type14)
+data_sd$ecart_type15 <-as.numeric(data_sd$ecart_type15)
+data_sd$ecart_type16 <-as.numeric(data_sd$ecart_type16)
+data_sd$ecart_type17 <-as.numeric(data_sd$ecart_type17)
+
+data_sd_new<-as.data.frame(t(data_sd))
+
+# jamais significatif
+
+wilcox.test(data_sd_new$BER,data_sd_new$BOU )
+wilcox.test(data_sd_new$BER,data_sd_new$DES )
+wilcox.test(data_sd_new$BER,data_sd_new$PRA )
+wilcox.test(data_sd_new$BER,data_sd_new$PRB )
+wilcox.test(data_sd_new$BER,data_sd_new$PRC )
+wilcox.test(data_sd_new$BER,data_sd_new$PRD )
+
+wilcox.test(data_sd_new$BOU,data_sd_new$DES )
+wilcox.test(data_sd_new$BOU,data_sd_new$PRA )
+wilcox.test(data_sd_new$BOU,data_sd_new$PRB )
+wilcox.test(data_sd_new$BOU,data_sd_new$PRC )
+wilcox.test(data_sd_new$BOU,data_sd_new$PRD )
+
+wilcox.test(data_sd_new$DES,data_sd_new$PRA )
+wilcox.test(data_sd_new$DES,data_sd_new$PRB )
+wilcox.test(data_sd_new$DES,data_sd_new$PRC )
+wilcox.test(data_sd_new$DES,data_sd_new$PRD )
+
+wilcox.test(data_sd_new$PRA,data_sd_new$PRB )
+wilcox.test(data_sd_new$PRA,data_sd_new$PRC )
+wilcox.test(data_sd_new$PRA,data_sd_new$PRD )
+
+wilcox.test(data_sd_new$PRB,data_sd_new$PRC )
+wilcox.test(data_sd_new$PRB,data_sd_new$PRD )
+
+wilcox.test(data_sd_new$PRC,data_sd_new$PRD )
+
+```
+
+
+# calcule min, moy et max journalières 
+
+```{r}
+l = length(data_milieu)
+k = c(nrow(data_milieu[[1]]),nrow(data_milieu[[2]]),nrow(data_milieu[[3]]),nrow(data_milieu[[4]]),nrow(data_milieu[[5]]),nrow(data_milieu[[6]]),nrow(data_milieu[[7]]))
+data_jour <- c()
+day <- c()
+df_jour <- data.frame()
+origine <- c()
+data_moy <- c()
+data_min <- c()
+data_max <- c()
+j=1
+i=1
+for(i in 1:l){
+  
+      data_jour <- c()
+      moy <- c()
+      minimum <- c()
+      maximum <- c()
+      
+  for(j in 1:k[i]){
+     rownames(data_milieu[[i]]) <- 1:nrow(data_milieu[[i]])
+    if(is.na(data_milieu[[i]]$date[j+1]) == FALSE){
+    
+      if(data_milieu[[i]]$date[j] == data_milieu[[i]]$date[j+1]){     #permet d'avoir la meme date à j et j+1
+        data_jour <- c(data_jour,data_milieu[[i]]$temp[j])
+      
+      }
+    
+    else {
+             
+        data_jour <- c(data_jour,data_milieu[[i]]$temp[j])
+        moy <- c(moy,mean(data_jour))
+        data_moy <- c(data_moy,moy)
+        minimum <- c(minimum, min(data_jour))
+        maximum <- c(maximum, max(data_jour))
+        data_min <- c(data_min, minimum)
+        data_max <- c(data_max,maximum)
+        origine <- c(origine, names(data_milieu[i]))
+        day <- c(day, paste(data_milieu[[i]]$date[j]))
+        df_jour <- data.frame(origine,day,data_moy,data_min,data_max)
+        data_jour <- c()
+        moy <- c()
+        minimum <- c()
+        maximum <- c()
+    }
+    }
+    
+    else {    # sinon on réinitialise les vecteurs
+      data_jour <- c()
+      moy <- c()
+      minimum <- c()
+      maximum <- c()
+  
+    }
+  }
+}
+
+```
+
+
+```{r}
+df_jour$day <- as.Date(df_jour$day)
+donnees_jour_split <- split(df_jour,f= df_jour$origine)
+```
+
+```{r}
+plot(donnees_jour_split$DES$day, donnees_jour_split$DES$data_moy)
+```
+
+
+#Somme température-jour
+
+Somme des moyennes journalières pour chaque année, chaque milieu, jusqu'en août 
+
+pour chaque milieu en tout:
+```{r}
+l <- length(donnees_jour_split)
+somme_t_j <- 0
+k <- c(nrow(donnees_jour_split[[1]]),nrow(donnees_jour_split[[2]]),nrow(donnees_jour_split[[3]]),nrow(donnees_jour_split[[4]]),nrow(donnees_jour_split[[5]]),nrow(donnees_jour_split[[6]]),nrow(donnees_jour_split[[7]]))
+df_somme <- data.frame()
+i=1
+j=1
+year <- c()
+origine <- c()
+somme <-c()
+
+for(i in 1:l){
+  origine <- c(origine, names(donnees_jour_split[i]))
+  somme_t_j <- 0
+  for(j in 1:k[i]){
+  
+  if(donnees_jour_split[[i]]$data_moy[j] > 0){
+    
+    somme_t_j <- somme_t_j + donnees_jour_split[[i]]$data_moy[j]
+    }
+  }
+  somme <- c(somme, somme_t_j)
+  df_somme <- data.frame(origine,somme)
+}
+```
+
+par année:
+```{r}
+l <- length(donnees_jour_split)
+somme_t_j = 0
+
+k <- c(nrow(donnees_jour_split[[1]]),nrow(donnees_jour_split[[2]]),nrow(donnees_jour_split[[3]]),nrow(donnees_jour_split[[4]]),nrow(donnees_jour_split[[5]]),nrow(donnees_jour_split[[6]]),nrow(donnees_jour_split[[7]]))
+df_somme_an <- data.frame()
+annees <- c("2013", "2014", "2015", "2016", "2017", "2018", "2019")
+
+m <- length(annees)
+ori <- c()
+i = 1
+j = 1
+h = 1
+somme <- c()
+
+for (i in 1:l) {
+  #boucle du milieu
+  origine <- c()
+  origine <- c(origine, names(donnees_jour_split[i]))
+  h = 1
+  # BUG
+  for(h in 1:m){
+    for (j in 1:k[i]) {
+      if (donnees_jour_split[[i]]$data_moy[j] > 0 & format(donnees_jour_split[[i]]$day[j], "%Y") == annees[h]) {
+        somme_t_j <- somme_t_j + donnees_jour_split[[i]]$data_moy[j]
+      }
+    }
+    an <- rep.int(annees, times = h)
+    ori <- c(ori,origine)
+    somme <- c(somme, somme_t_j)
+    somme_t_j <- 0
+  }
+}
+df_somme_an <- data.frame(ori,an,somme)
+```
+
+
+
+
+
+## Relier les données de températures aux taux de croissance
+
+Lambda réalisé
+```{r}
+library(readxl)
+Lambda_r <- read_excel("Lambda.xlsx", col_types = c("text", 
+    "numeric", "numeric", "numeric", "numeric", 
+    "numeric", "numeric", "numeric"))
+
+Lambda_r <- Lambda_r[-c(1:13),]
+Lambda_r<- Lambda_r[,-1]
+Lambda_r <- Lambda_r[-(nrow(Lambda_r)),]
+rownames(Lambda_r) <- c("2013-2014", "2014-2015", "2015-2016", "2016-2017", "2017-2018")
+```
+
+
+```{r}
+Lambdar_df <- as.data.frame(t(Lambda_r))
+```
+
+```{r}
+plot(Lambda_r$BER)
+
+```
+
+Lambda
+```{r}
+library(readxl)
+Lambda <- read_excel("Lambda2.xlsx", col_types = c("text", 
+    "numeric", "numeric", "numeric", "numeric", 
+    "numeric", "numeric", "numeric"))
+Lambda <- Lambda[,-1]
+rownames(Lambda) <- c("2013-2014", "2014-2015", "2015-2016", "2016-2017", "2017-2018")
+```
+
+
+
+
+```{r}
+Lambda_df <- as.data.frame(t(Lambda))
+```
+
+```{r}
+plot(Lambda$BER)
+
+```
+
+## test pour les températures minimum
+
+seuil = 15°C
+```{r}
+i=1
+j=1
+res<-c()
+for(i in 1:nrow(df_jour)){
+      res <- c(res,df_jour$data_min[i] > 15)
+
+}
+
+df_jour15 <- cbind (df_jour,res)
+
+```
+
+```{r}
+donnees_jour_min15 <- split(df_jour15,f= df_jour15$origine)
+```
+
+
+```{r}
+i=1
+j=1
+l<- c(nrow(donnees_jour_min15$BER),nrow(donnees_jour_min15$BOU),nrow(donnees_jour_min15$DES),nrow(donnees_jour_min15$PRA),nrow(donnees_jour_min15$PRB),nrow(donnees_jour_min15$PRC),nrow(donnees_jour_min15$PRD))
+add_min <- c()
+
+annees <- c("2013", "2014", "2015", "2016", "2017", "2018", "2019")
+m<- length(annees)
+an <- c()
+add = 0
+origine <- c()
+
+for (i in 1:length(donnees_jour_min15)) {
+  add = 0
+  rownames(donnees_jour_min15[[i]]) <- 1:nrow(donnees_jour_min15[[i]])
+  for(h in 1:m){
+  for (j in 1:l[i]) {
+    
+    if (is.na(donnees_jour_min15[[i]]$res[j + 1]) == FALSE){
+      
+    if(format(donnees_jour_split[[i]]$day[j], "%Y") == annees[h]){
+      if(donnees_jour_min15[[i]]$res[j] == donnees_jour_min15[[i]]$res[j + 1] & donnees_jour_min15[[i]]$res[j] == TRUE){
+        add = add + 1
+        print(add)
+       
+      }
+      else{
+        add_min <- c(add_min,(add+1))    # on fait + 1 car ça enlève 1 à chaque fois que c'est TRUE (pas grave car après on compte que quand c'est supérieur ou égal à 3)
+        an <- c(an, annees[h])
+        origine <- c(origine, names(donnees_jour_min15[i]))
+        add = 0
+      }
+    }
+    }
+  }
+      
+  }
+}
+
+seuil_min15 <- cbind(add_min,an, origine)
+seuil_min15 <- as.data.frame(seuil_min15)
+seuil_min15$add_min <- as.numeric(seuil_min15$add_min)
+seuil_min_split15 <- split(seuil_min15, f= seuil_min15$origine)
+```
+
+additionner si nombre de jour consécutif supérieur à 3
+```{r}
+l <- c(nrow(seuil_min_split15$BER),nrow(seuil_min_split15$BOU),nrow(seuil_min_split15$DES),nrow(seuil_min_split15$PRA),nrow(seuil_min_split15$PRB),nrow(seuil_min_split15$PRC),nrow(seuil_min_split15$PRD))
+i=1
+j=1
+h=1
+seuil =0
+origine <- c()
+an <- c()
+
+min_consecutif <- c()
+annees <- c("2013", "2014", "2015", "2016", "2017", "2018", "2019")
+m <- length(annees)
+for (i in 1:length(seuil_min_split15)) {
+  rownames(seuil_min_split15[[i]]) <- 1:nrow(seuil_min_split15[[i]])
+  for (h in 1:m) {
+    for (j in 1:l[i]) {
+      if (seuil_min_split15[[i]]$an[j] == annees[h]) {
+        if (seuil_min_split15[[i]]$add_min[j] >= 3) {
+          seuil = seuil + seuil_min_split15[[i]]$add_min[j]
+        }
+      }
+    }
+    min_consecutif <- c(min_consecutif, seuil)
+    an <- c(an, annees[h])
+    origine <- c(origine, names(donnees_jour_min15[i]))
+    seuil = 0
+  }
+}
+
+res_seuil_15 <- cbind(min_consecutif,an, origine)
+res_seuil_15 <- as.data.frame(res_seuil_15)
+```
+
+seuil = 10°C
+```{r}
+i=1
+j=1
+res<-c()
+for(i in 1:nrow(df_jour)){
+      res <- c(res,df_jour$data_min[i] > 10)
+
+}
+
+df_jour10 <- cbind (df_jour,res)
+
+```
+
+```{r}
+donnees_jour_min10 <- split(df_jour10,f= df_jour10$origine)
+```
+
+```{r}
+i=1
+j=1
+l<- c(nrow(donnees_jour_min10$BER),nrow(donnees_jour_min10$BOU),nrow(donnees_jour_min10$DES),nrow(donnees_jour_min10$PRA),nrow(donnees_jour_min10$PRB),nrow(donnees_jour_min10$PRC),nrow(donnees_jour_min10$PRD))
+add_min <- c()
+
+annees <- c("2013", "2014", "2015", "2016", "2017", "2018", "2019")
+m<- length(annees)
+an <- c()
+add = 0
+origine <- c()
+
+for (i in 1:length(donnees_jour_min10)) {
+  add = 0
+  rownames(donnees_jour_min10[[i]]) <- 1:nrow(donnees_jour_min10[[i]])
+  for(h in 1:m){
+  for (j in 1:l[i]) {
+    
+    if (is.na(donnees_jour_min10[[i]]$res[j + 1]) == FALSE){
+      
+    if(format(donnees_jour_split[[i]]$day[j], "%Y") == annees[h]){
+      if(donnees_jour_min10[[i]]$res[j] == donnees_jour_min10[[i]]$res[j + 1] & donnees_jour_min10[[i]]$res[j] == TRUE){
+        add = add + 1
+       
+      }
+      else{
+        add_min <- c(add_min,(add+1))
+        an <- c(an, annees[h])
+        origine <- c(origine, names(donnees_jour_min10[i]))
+        add = 0
+      }
+    }
+    }
+  }
+      
+  }
+}
+
+seuil_min10 <- cbind(add_min,an, origine)
+seuil_min10 <- as.data.frame(seuil_min10)
+seuil_min10$add_min <- as.numeric(seuil_min10$add_min)
+seuil_min_split10 <- split(seuil_min10, f= seuil_min10$origine)
+```
+
+additionner si nombre de jour consécutif supérieur à 3
+```{r}
+l <- c(nrow(seuil_min_split10$BER),nrow(seuil_min_split10$BOU),nrow(seuil_min_split10$DES),nrow(seuil_min_split10$PRA),nrow(seuil_min_split10$PRB),nrow(seuil_min_split10$PRC),nrow(seuil_min_split10$PRD))
+i=1
+j=1
+h=1
+seuil =0
+an <- c()
+origine <- c()
+
+min_consecutif <- c()
+annees <- c("2013", "2014", "2015", "2016", "2017", "2018", "2019")
+m <- length(annees)
+for (i in 1:length(seuil_min_split10)) {
+  rownames(seuil_min_split10[[i]]) <- 1:nrow(seuil_min_split10[[i]])
+  for (h in 1:m) {
+    for (j in 1:l[i]) {
+      if (seuil_min_split10[[i]]$an[j] == annees[h]) {
+        if (seuil_min_split10[[i]]$add_min[j] >= 3) {
+          seuil = seuil + seuil_min_split10[[i]]$add_min[j]
+        }
+      }
+    }
+    min_consecutif <- c(min_consecutif, seuil)
+    an <- c(an, annees[h])
+    origine <- c(origine, names(donnees_jour_min10[i]))
+    seuil = 0
+  }
+}
+
+res_seuil_10 <- cbind(min_consecutif,an, origine)
+res_seuil_10 <- as.data.frame(res_seuil_10)
+```
+
+seuil = 20°C
+```{r}
+i=1
+j=1
+res<-c()
+for(i in 1:nrow(df_jour)){
+      res <- c(res,df_jour$data_min[i] > 20)
+
+}
+
+df_jour20 <- cbind (df_jour,res)
+
+```
+
+```{r}
+donnees_jour_min20 <- split(df_jour20,f= df_jour20$origine)
+```
+
+```{r}
+i=1
+j=1
+l<- c(nrow(donnees_jour_min20$BER),nrow(donnees_jour_min20$BOU),nrow(donnees_jour_min20$DES),nrow(donnees_jour_min20$PRA),nrow(donnees_jour_min20$PRB),nrow(donnees_jour_min20$PRC),nrow(donnees_jour_min20$PRD))
+add_min <- c()
+
+annees <- c("2013", "2014", "2015", "2016", "2017", "2018", "2019")
+m<- length(annees)
+an <- c()
+add = 0
+origine <- c()
+
+for (i in 1:length(donnees_jour_min20)) {
+  add = 0
+  rownames(donnees_jour_min20[[i]]) <- 1:nrow(donnees_jour_min20[[i]])
+  for(h in 1:m){
+  for (j in 1:l[i]) {
+    
+    if (is.na(donnees_jour_min20[[i]]$res[j + 1]) == FALSE){
+      
+    if(format(donnees_jour_split[[i]]$day[j], "%Y") == annees[h]){
+      if(donnees_jour_min20[[i]]$res[j] == donnees_jour_min20[[i]]$res[j + 1] & donnees_jour_min20[[i]]$res[j] == TRUE){
+        add = add + 1
+       
+      }
+      else{
+        add_min <- c(add_min,(add+1))
+        an <- c(an, annees[h])
+        origine <- c(origine, names(donnees_jour_min20[i]))
+        add = 0
+      }
+    }
+    }
+  }
+      
+  }
+}
+
+seuil_min20 <- cbind(add_min,an, origine)
+seuil_min20 <- as.data.frame(seuil_min20)
+seuil_min20$add_min <- as.numeric(seuil_min20$add_min)
+seuil_min_split20 <- split(seuil_min20, f= seuil_min20$origine)
+```
+
+additionner si nombre de jour consécutif supérieur à 3
+```{r}
+l <- c(nrow(seuil_min_split20$BER),nrow(seuil_min_split20$BOU),nrow(seuil_min_split20$DES),nrow(seuil_min_split20$PRA),nrow(seuil_min_split20$PRB),nrow(seuil_min_split20$PRC),nrow(seuil_min_split20$PRD))
+i=1
+j=1
+h=1
+seuil =0
+an <- c()
+origine <- c()
+
+min_consecutif <- c()
+annees <- c("2013", "2014", "2015", "2016", "2017", "2018", "2019")
+m <- length(annees)
+for (i in 1:length(seuil_min_split20)) {
+  rownames(seuil_min_split20[[i]]) <- 1:nrow(seuil_min_split20[[i]])
+  for (h in 1:m) {
+    for (j in 1:l[i]) {
+      if (seuil_min_split20[[i]]$an[j] == annees[h]) {
+        if (seuil_min_split20[[i]]$add_min[j] >= 3) {
+          seuil = seuil + seuil_min_split20[[i]]$add_min[j]
+        }
+      }
+    }
+    min_consecutif <- c(min_consecutif, seuil)
+    an <- c(an, annees[h])
+    origine <- c(origine, names(donnees_jour_min15[i]))
+    seuil = 0
+  }
+}
+
+res_seuil_20 <- cbind(min_consecutif,an, origine)
+res_seuil_20 <- as.data.frame(res_seuil_20)
+```
+
+seuil = 13°C
+```{r}
+i=1
+j=1
+res<-c()
+for(i in 1:nrow(df_jour)){
+      res <- c(res,df_jour$data_min[i] > 13)
+
+}
+
+df_jour13 <- cbind (df_jour,res)
+
+```
+
+```{r}
+donnees_jour_min13 <- split(df_jour13,f= df_jour13$origine)
+```
+
+
+```{r}
+i=1
+j=1
+l<- c(nrow(donnees_jour_min13$BER),nrow(donnees_jour_min13$BOU),nrow(donnees_jour_min13$DES),nrow(donnees_jour_min13$PRA),nrow(donnees_jour_min13$PRB),nrow(donnees_jour_min13$PRC),nrow(donnees_jour_min13$PRD))
+add_min <- c()
+
+annees <- c("2013", "2014", "2015", "2016", "2017", "2018", "2019")
+m<- length(annees)
+an <- c()
+add = 0
+origine <- c()
+
+for (i in 1:length(donnees_jour_min13)) {
+  add = 0
+  rownames(donnees_jour_min13[[i]]) <- 1:nrow(donnees_jour_min13[[i]])
+  for(h in 1:m){
+  for (j in 1:l[i]) {
+    
+    if (is.na(donnees_jour_min13[[i]]$res[j + 1]) == FALSE){
+      
+    if(format(donnees_jour_split[[i]]$day[j], "%Y") == annees[h]){
+      if(donnees_jour_min13[[i]]$res[j] == donnees_jour_min13[[i]]$res[j + 1] & donnees_jour_min13[[i]]$res[j] == TRUE){
+        add = add + 1
+       
+      }
+      else{
+        add_min <- c(add_min,(add+1))    # on fait + 1 car ça enlève 1 à chaque fois que c'est TRUE (pas grave car après on compte que quand c'est supérieur ou égal à 3)
+        an <- c(an, annees[h])
+        origine <- c(origine, names(donnees_jour_min13[i]))
+        add = 0
+      }
+    }
+    }
+  }
+      
+  }
+}
+
+seuil_min13 <- cbind(add_min,an, origine)
+seuil_min13 <- as.data.frame(seuil_min13)
+seuil_min13$add_min <- as.numeric(seuil_min13$add_min)
+seuil_min_split13 <- split(seuil_min13, f= seuil_min13$origine)
+```
+
+additionner si nombre de jour consécutif supérieur à 3
+```{r}
+l <- c(nrow(seuil_min_split13$BER),nrow(seuil_min_split13$BOU),nrow(seuil_min_split13$DES),nrow(seuil_min_split13$PRA),nrow(seuil_min_split13$PRB),nrow(seuil_min_split13$PRC),nrow(seuil_min_split13$PRD))
+i=1
+j=1
+h=1
+seuil =0
+origine <- c()
+an <- c()
+
+min_consecutif <- c()
+annees <- c("2013", "2014", "2015", "2016", "2017", "2018", "2019")
+m <- length(annees)
+for (i in 1:length(seuil_min_split13)) {
+  rownames(seuil_min_split13[[i]]) <- 1:nrow(seuil_min_split13[[i]])
+  for (h in 1:m) {
+    for (j in 1:l[i]) {
+      if (seuil_min_split13[[i]]$an[j] == annees[h]) {
+        if (seuil_min_split13[[i]]$add_min[j] >= 3) {
+          seuil = seuil + seuil_min_split13[[i]]$add_min[j]
+        }
+      }
+    }
+    min_consecutif <- c(min_consecutif, seuil)
+    an <- c(an, annees[h])
+    origine <- c(origine, names(donnees_jour_min13[i]))
+    seuil = 0
+  }
+}
+
+res_seuil_13 <- cbind(min_consecutif,an, origine)
+res_seuil_13 <- as.data.frame(res_seuil_13)
+```
+
+
+
+```{r}
+library(tidyr)
+library(ade4)
+```
+
+
+```{r}
+BER_pe <- BER
+BER_pe19 <- nrow(BER_pe[c(18492:nrow(BER)),])/8
+BER_pe18 <- nrow(BER_pe[c(15628:16890),])/8
+BER_pe17 <- nrow(BER_pe[c(12652:14050),])/8
+BER_pe16 <- nrow(BER_pe[c(9708:10938),])/8
+BER_pe15 <- nrow(BER_pe[c(6780:8066),])/8
+BER_pe14 <- nrow(BER_pe[c(3860:5098),])/8
+BER_pe13 <- nrow(BER_pe[c(980:2282),])/8
+```
+
+
+```{r}
+BOU_pe <- BOU
+BOU_pe19 <- nrow(BOU_pe[c(18479:nrow(BOU)),])/8
+BOU_pe18 <- nrow(BOU_pe[c(15615:16821),])/8
+BOU_pe17 <- nrow(BOU_pe[c(12655:14077),])/8
+BOU_pe16 <- nrow(BOU_pe[c(9630:10901),])/8
+BOU_pe15 <- nrow(BOU_pe[c(6767:8029),])/8
+BOU_pe14 <- nrow(BOU_pe[c(3775:5077),])/8
+BOU_pe13 <- nrow(BOU_pe[c(975:2269),])/8
+```
+
+```{r}
+DES_pe <- DES
+DES_pe18 <- nrow(DES_pe[c(15605:16979),])/8
+DES_pe17 <- nrow(DES_pe[c(12621:14251),])/8
+DES_pe16 <- nrow(DES_pe[c(9508:10939),])/8
+DES_pe15 <- nrow(DES_pe[c(6709:8083),])/8
+DES_pe14 <- nrow(DES_pe[c(3773:5171),])/8
+DES_pe13 <- nrow(DES_pe[c(965:2747),])/8
+```
+
+```{r}
+PRA_pe <- PRA
+PRA_pe18 <- nrow(PRA_pe[c(15621:16676),])/8
+PRA_pe17 <- nrow(PRA_pe[c(12597:13923),])/8
+PRA_pe16 <- nrow(PRA_pe[c(9677:10708),])/8
+PRA_pe15 <- nrow(PRA_pe[c(6869:7955),])/8
+PRA_pe14 <- nrow(PRA_pe[c(4069:5051),])/8
+PRA_pe13 <- nrow(PRA_pe[c(933:2060),])/8
+```
+
+```{r}
+PRB_pe <- PRB
+PRB_pe17 <- nrow(PRB_pe[c(12573:13963),])/8
+PRB_pe16 <- nrow(PRB_pe[c(9653:10875),])/8
+PRB_pe15 <- nrow(PRB_pe[c(6845:8043),])/8
+PRB_pe14 <- nrow(PRB_pe[c(4045:5043),])/8
+PRB_pe13 <- nrow(PRB_pe[c(869:2075),])/8
+```
+
+```{r}
+PRC_pe <- PRC
+PRC_pe18 <- nrow(PRC_pe[c(15573:16843),])/8
+PRC_pe17 <- nrow(PRC_pe[c(12557:13995),])/8
+PRC_pe16 <- nrow(PRC_pe[c(9645:10875),])/8
+PRC_pe15 <- nrow(PRC_pe[c(6845:8059),])/8
+PRC_pe14 <- nrow(PRC_pe[c(3877:4828),])/8
+PRC_pe13 <- nrow(PRC_pe[c(917:2155),])/8
+```
+
+```{r}
+PRD_pe <- PRD
+PRD_pe19 <- nrow(PRD_pe[c(18188:nrow(PRD)),])/8
+PRD_pe18 <- nrow(PRD_pe[c(15380:16674),])/8
+PRD_pe17 <- nrow(PRD_pe[c(12356:13810),])/8
+PRD_pe16 <- nrow(PRD_pe[c(9444:10523),])/8
+PRD_pe15 <- nrow(PRD_pe[c(6636:7818),])/8
+PRD_pe14 <- nrow(PRD_pe[c(3788:4667),])/8
+PRD_pe13 <- nrow(PRD_pe[c(668:1819),])/8
+```
+
+
+```{r}
+periode_neige <- rbind(BER_pe13,BER_pe14,BER_pe15,BER_pe16,BER_pe17,BER_pe18,BER_pe19, BOU_pe13,BOU_pe14,BOU_pe15,BOU_pe16,BOU_pe17,BOU_pe18,BOU_pe19,DES_pe13,DES_pe14,DES_pe15,DES_pe16,DES_pe17,DES_pe18,PRA_pe13,PRA_pe14,PRA_pe15,PRA_pe16,PRA_pe17,PRA_pe18,PRB_pe13,PRB_pe14,PRB_pe15,PRB_pe16,PRB_pe17,PRC_pe13,PRC_pe14,PRC_pe15,PRC_pe16,PRC_pe17,PRC_pe18,PRD_pe13,PRD_pe14,PRD_pe15,PRD_pe16,PRD_pe17,PRD_pe18,PRD_pe19)
+```
+
+## test corrélation lambda / variable bioclimatique
+
+```{r}
+col_order <- c("BER", "BOU", "DES",
+               "PRA", "PRB","PRC", "PRD")
+Lambda_r <-Lambda_r[, col_order]
+Lambdar_df<- t(Lambda_r)
+Lambda_df <- t(Lambda)
+```
+
+## annee i
+
+revoir si les années de lambda correspondent bien aux années de température
+```{r}
+lambda_m <-matrix(unlist(t(Lambda_df)), byrow=T, 35, 1)
+lambdar_m <-matrix(unlist(t(Lambdar_df)), byrow=T, 35, 1)
+lambda <- as.data.frame(lambda_m)
+lambdar <- as.data.frame(lambdar_m)
+format_seuil_10 <- res_seuil_10[-c(1,7,8,14,15,21,22,28,29,35,36,42,43,49),]
+format_seuil_13 <- res_seuil_13[-c(1,7,8,14,15,21,22,28,29,35,36,42,43,49),]
+format_seuil_15 <- res_seuil_15[-c(1,7,8,14,15,21,22,28,29,35,36,42,43,49),]
+df_somme_an_test <- df_somme_an[-c(1,7,8,14,15,21,22,28,29,35,36,42,43,49),]
+test_seuil_lambda <- cbind(lambda,lambdar,format_seuil_13$min_consecutif,df_somme_an_test$somme,format_seuil_15$min_consecutif,format_seuil_10)
+names(test_seuil_lambda)[1] <- "Lambda"
+names(test_seuil_lambda)[2] <- "Lambda_réalisé"
+names(test_seuil_lambda)[3] <- "Seuil_13"
+names(test_seuil_lambda)[4] <- "Somme_temperature_jour"
+names(test_seuil_lambda)[5] <- "Seuil_15"
+names(test_seuil_lambda)[6] <- "Seuil_10"
+id <- paste(test_seuil_lambda$an, test_seuil_lambda$origine, sep="_")
+```
+
+```{r}
+test_seuil_lambda <- cbind(test_seuil_lambda, id)
+test_seuil_lambda_p <- test_seuil_lambda
+```
+
+```{r}
+test_seuil_lambda<- test_seuil_lambda[-c(8,9,25),]
+#test_seuil_lambda<- test_seuil_lambda[-9,]
+test_seuil_lambda$Seuil_10 <- as.numeric(test_seuil_lambda$Seuil_10)
+test_seuil_lambda$Seuil_15 <- as.numeric(test_seuil_lambda$Seuil_15)
+test_seuil_lambda$Seuil_13 <- as.numeric(test_seuil_lambda$Seuil_13)
+```
+
+```{r}
+rownames(test_seuil_lambda) <- test_seuil_lambda[,9]
+test_seuil_lambda<- test_seuil_lambda[,-9]
+```
+
+```{r}
+# acpI=dudi.pca(test_seuil_lambda)
+# acpI$li
+# acpI$co
+# s.label(acpI$li,xax=1,yax=2,sub="axe1/axe2")
+# s.arrow(3*acpI$co,xax=1,yax=2,add.plot=T)
+# s.corcircle(acpI$co,xax=1,yax=2,sub="axe1/axe2")
+```
+
+```{r}
+# inertia.dudi(acpI, col=T, row=T)$col.abs
+```
+
+test pour lambda réalisé
+
+```{r}
+cor.test(test_seuil_lambda$Somme_temperature_jour,test_seuil_lambda$Lambda_réalisé, method = "spearman")
+cor.test(test_seuil_lambda$Seuil_10,test_seuil_lambda$Lambda_réalisé)
+cor.test(test_seuil_lambda$Seuil_15,test_seuil_lambda$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(test_seuil_lambda$Seuil_13,test_seuil_lambda$Lambda_réalisé, method = "spearman", exact = F)
+
+```
+
+```{r}
+library(plotfunctions)
+```
+
+
+```{r}
+par( mfrow=c(1,2))
+plotA <- plot(test_seuil_lambda$Somme_temperature_jour,test_seuil_lambda$Lambda_réalisé,col="black",ylab="Lambda réalisé", xlab="Somme des températures-jours (en °C)", pch=19, ylim = c(0.4,2))
+legend(1650, 2, legend="A",cex=1, box.lty=0, text.font=2)
+plotB <- plot(test_seuil_lambda$Seuil_10,test_seuil_lambda$Lambda_réalisé,col="red",ylab="Lambda réalisé", xlab='Nombre de jours consécutifs avec une \n température minimale supérieure à 10°C', pch=19, ylim=c(0,2))
+legend(55, 2, legend="B",cex=1, box.lty=0, text.font=2)
+```
+
+```{r}
+plot(df_somme_an$an,df_somme_an$somme)
+plot(res_seuil_10$an, res_seuil_10$min_consecutif)
+plot(res_seuil_15$an, res_seuil_15$min_consecutif)
+plot(res_seuil_20$an, res_seuil_20$min_consecutif)
+
+```
+
+test pour lambda:
+```{r}
+test_seuil_lambdaa<- test_seuil_lambda[-c(6,7,9),]
+
+
+cor.test(test_seuil_lambdaa$Somme_temperature_jour,test_seuil_lambdaa$Lambda)
+cor.test(test_seuil_lambdaa$Seuil_10,test_seuil_lambdaa$Lambda)
+cor.test(test_seuil_lambdaa$Seuil_13,test_seuil_lambdaa$Lambda, method = "spearman", exact = F)
+cor.test(test_seuil_lambdaa$Seuil_15,test_seuil_lambdaa$Lambda, method = "spearman", exact = F)
+
+
+```
+
+```{r}
+par(mfrow=c(2,2))
+plot(test_seuil_lambda$Somme_temperature_jour,test_seuil_lambda$Lambda_réalisé,col="black",ylab="Lambda réalisé", xlab="Somme des températures-jours (en °C)", pch=19, ylim = c(0.4,2))
+legend(1650, 2, legend="A",cex=1, box.lty=0, text.font=2)
+plot(test_seuil_lambda$Seuil_10,test_seuil_lambda$Lambda_réalisé,col="red",ylab="Lambda réalisé", xlab='Nombre de jours consécutifs avec une \n température minimale supérieure à 10°C', pch=19, ylim=c(0,2))
+legend(55, 2, legend="B",cex=1, box.lty=0, text.font=2)
+plot(test_seuil_lambdaa$Somme_temperature_jour,test_seuil_lambdaa$Lambda, col="black", ylab="Lambda asymptotique" , xlab="Somme des températures-jours (en °C)", pch=19, ylim=c(0.8,1.3))
+legend(900, 1.3, legend="C",cex=1, box.lty=0, text.font=2)
+plot(test_seuil_lambdaa$Seuil_10,test_seuil_lambdaa$Lambda, col="red",ylab="Lambda asymptotique", xlab="Nombre de jours consécutifs avec une \n température minimale supérieure à 10°C", pch=19, ylim=c(0.8,1.3))
+legend(30, 1.3, legend="D",cex=1, box.lty=0, text.font=2)
+```
+
+## annee i-1
+
+```{r}
+lambda_m <-matrix(unlist(t(Lambda_df)), byrow=T, 35, 1)
+lambdar_m <-matrix(unlist(t(Lambdar_df)), byrow=T, 35, 1)
+lambda <- as.data.frame(lambda_m)
+lambdar <- as.data.frame(lambdar_m)
+data_sd_m <- matrix(unlist(t(data_sd_new)), byrow=T, 35, 1)
+saisonnalite <- as.data.frame(data_sd_m)
+format_seuil_10 <- res_seuil_10[-c(6,7,13,14,20,21,27,28,34,35,41,42,48,49),]
+format_seuil_13 <- res_seuil_13[-c(6,7,13,14,20,21,27,28,34,35,41,42,48,49),]
+format_seuil_15 <- res_seuil_15[-c(6,7,13,14,20,21,27,28,34,35,41,42,48,49),]
+format_seuil_20 <- res_seuil_20[-c(6,7,13,14,20,21,27,28,34,35,41,42,48,49),]
+df_somme_an_test <- df_somme_an[-c(6,7,13,14,20,21,27,28,34,35,41,42,48,49),]
+periode_neige1 <- periode_neige[-c(6,7,13,14,20,26,37,43,44),]
+test_seuil_lambda <- cbind(lambda, lambdar,saisonnalite,periode_neige1,df_somme_an_test$somme,format_seuil_15$min_consecutif,format_seuil_13$min_consecutif,format_seuil_10)
+names(test_seuil_lambda)[1] <- "Lambda"
+names(test_seuil_lambda)[2] <- "Lambda_réalisé"
+names(test_seuil_lambda)[3] <- "Saisonnalité"
+names(test_seuil_lambda)[4] <- "Duree_enneigement"
+names(test_seuil_lambda)[5] <- "Somme_temperature_jour"
+names(test_seuil_lambda)[6] <- "Seuil_15"
+names(test_seuil_lambda)[7] <- "Seuil_13"
+names(test_seuil_lambda)[8] <- "Seuil_10"
+id <- paste(test_seuil_lambda$an, test_seuil_lambda$origine, sep="_")
+test_seuil_lambda_ <- cbind(test_seuil_lambda, id)
+``` 
+
+```{r}
+test_seuil_lambda_$Seuil_10 <- as.numeric(test_seuil_lambda_$Seuil_10)
+test_seuil_lambda_$Seuil_15 <- as.numeric(test_seuil_lambda_$Seuil_15)
+test_seuil_lambda_$Seuil_13 <- as.numeric(test_seuil_lambda_$Seuil_13)
+test_seuil_lambda_$Seuil_13 <- as.numeric(test_seuil_lambda_$Duree_enneigement)
+test_seuil_lambda_$Lambda <- as.numeric(test_seuil_lambda_$Lambda)
+test_seuil_lambda_ <- test_seuil_lambda_[-c(1,6,8, 9, 11, 16,21,26,31),]
+```
+
+```{r}
+rownames(test_seuil_lambda_) <- test_seuil_lambda_[,11]
+test_seuil_lambda_<- test_seuil_lambda_[,-11]
+```
+
+```{r}
+# acpL=dudi.pca(test_seuil_lambda_)
+# inertia.dudi(acpL, col=T, row=T)$tot.inertia
+# 
+# acpL$eig
+# #Pour tracer le graphique des éboulis (eig = eigne value
+# # valeur propre => inertie sur les axes)
+# # on garde 2 axes car 70% de l'inertie 
+# plot(acpL$eig,t="h", main="eboulis des valeurs propres")
+# acpL$li
+# acpL$co
+# s.label(acpL$li,xax=1,yax=2,sub="axe1/axe2")
+# s.arrow(3*acpL$co,xax=1,yax=2,add.plot=T)
+# s.corcircle(acpL$co,xax=1,yax=2,sub="axe1/axe2")
+# s.corcircle(acpL$co,xax=2,yax=3,sub="axe1/axe2")
+```
+```{r}
+# inertia.dudi(acpL, col=T, row=T)$col.abs
+```
+
+test pour Lambda réalisé
+
+```{r}
+cor.test(test_seuil_lambda_$Somme_temperature_jour,test_seuil_lambda_$Lambda_réalisé, method = "spearman")
+cor.test(test_seuil_lambda_$Seuil_10,test_seuil_lambda_$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(test_seuil_lambda_$Seuil_13,test_seuil_lambda_$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(test_seuil_lambda_$Seuil_15,test_seuil_lambda_$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(test_seuil_lambda_$Duree_enneigement, test_seuil_lambda_$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(test_seuil_lambda_$Saisonnalité, test_seuil_lambda_$Lambda_réalisé, method = "spearman", exact = F)
+
+```
+
+```{r}
+par(mfrow=c(1,2))
+plot(test_seuil_lambda_$Somme_temperature_jour,test_seuil_lambda_$Lambda_réalisé, col="black",ylab="Lambda réalisé", xlab="Somme des températures jours (en °C)", pch=19, ylim=c(0.4,1.8))
+legend(1700, 1.8, legend="A",cex=1, box.lty=0, text.font=2)
+plot(test_seuil_lambda_$Seuil_10,test_seuil_lambda_$Lambda_réalisé,col="red",ylab="Lambda réalisé", xlab="Nombre de jours consécutifs avec une \n température minimale supérieure à 10°C", pch=19, ylim=c(0.4,1.8))
+legend(55, 1.8, legend="B",cex=1, box.lty=0, text.font=2)
+```
+
+
+
+```{r}
+plot(df_somme_an$an,df_somme_an$somme)
+plot(res_seuil_10$an, res_seuil_10$min_consecutif)
+plot(res_seuil_15$an, res_seuil_15$min_consecutif)
+plot(res_seuil_20$an, res_seuil_20$min_consecutif)
+```
+
+test pour lambda:
+```{r}
+
+cor.test(test_seuil_lambdaa_$Somme_temperature_jour,test_seuil_lambdaa_$Lambda, method = "spearman", exact= F)
+cor.test(test_seuil_lambdaa_$Seuil_10,test_seuil_lambdaa_$Lambda, method = "spearman", exact = F)
+cor.test(test_seuil_lambdaa_$Seuil_13,test_seuil_lambdaa_$Lambda, method = "spearman", exact = F)
+cor.test(test_seuil_lambdaa_$Seuil_15,test_seuil_lambdaa_$Lambda, method = "spearman", exact = F)
+cor.test(test_seuil_lambdaa_$Duree_enneigement, test_seuil_lambdaa_$Lambda, method = "spearman", exact = F)
+cor.test(test_seuil_lambdaa_$Saisonnalité, test_seuil_lambdaa_$Lambda, method = "spearman", exact = F)
+
+```
+
+```{r}
+par(mfrow=c(2,2))
+plot(test_seuil_lambda_$Somme_temperature_jour,test_seuil_lambda_$Lambda_réalisé, col="black",ylab="Lambda réalisé", xlab="Somme des températures jours (en °C)", pch=19, ylim=c(0.4,1.8))
+legend(1700, 1.8, legend="A",cex=1, box.lty=0, text.font=2)
+plot(test_seuil_lambda_$Seuil_10,test_seuil_lambda_$Lambda_réalisé,col="red",ylab="Lambda réalisé", xlab="Nombre de jours consécutifs avec une \n température minimale supérieure à 10°C", pch=19, ylim=c(0.4,1.8))
+legend(55, 1.8, legend="B",cex=1, box.lty=0, text.font=2)
+plot(test_seuil_lambdaa_$Somme_temperature_jour,test_seuil_lambdaa_$Lambda, col="black",ylab="Lambda asymptotique", xlab="Somme des températures-jours (en °C)", pch=19, ylim=c(0.82,1.25))
+legend(1700, 1.25, legend="C",cex=1, box.lty=0, text.font=2)
+plot(test_seuil_lambdaa_$Seuil_10,test_seuil_lambdaa_$Lambda, col="red",ylab="Lambda asymptotique", xlab="Nombre de jours consécutifs avec une \n température minimale supérieure à 10°C", pch=19, ylim=c(0.82,1.25))
+legend(55, 1.25, legend="D",cex=1, box.lty=0, text.font=2)
+```
+
+
+## Mise en forme résultats
+```{r}
+library(ggplot2)
+library(hrbrthemes)
+library(viridis)
+library(ggsignif)
+library(ggpubr)
+library(rstatix)
+```
+
+
+```{r}
+test_seuil_lambda_p<- test_seuil_lambda_p[-25,]
+```
+
+
+```{r}
+
+anova = aov(Somme_temperature_jour ~ an, data = test_seuil_lambda_p)
+anova2 = aov(Somme_temperature_jour ~ origine, data = test_seuil_lambda_p)
+TUKEY <- TukeyHSD(anova, conf.level = 0.95)
+
+
+par(mfrow=c(2,2))
+plot1 <- ggplot(test_seuil_lambda_p, aes(x=an, y=Somme_temperature_jour, fill=an)) +
+    geom_boxplot() +
+    xlab("Année") +
+    ylab("Somme des températures-jours (en °C)") + annotate("text", x = c(1, 3), y = c(2700,2690), label = "a")+  annotate("text", x = 4, y = 2900, label = "b") + annotate("text", x = c(2,5), y = 2800, label = "ab")
+
+
+plot2 <- ggplot(test_seuil_lambda_p, aes(x=origine, y=Somme_temperature_jour, fill=origine)) +
+    geom_boxplot() +
+    xlab("Milieux") +
+    ylab("Somme des températures-jours (en °C)")
+
+figure <- ggarrange(plot1, plot2,
+                    labels = c("A", "B"),
+                    ncol = 2)
+figure
+
+
+```
+DES en 2014: enneigement jusqu'à fin juin
+
+
+
+
+
+#régression avec GDD
+```{r}
+#Année i
+
+## Lambda réalisé
+x <- test_seuil_lambda$Somme_temperature_jour
+y <- test_seuil_lambda$Lambda_réalisé
+plot(x,y)
+abline(lm(y ~ x), col="red", lty=2)
+lm_lambda_somme <- lm(y~x)
+summary(lm_lambda_somme)
+plot(lm_lambda_somme$residuals)
+abline(h=0,col="blue")
+ggplot(test_seuil_lambda, aes(Somme_temperature_jour,Lambda_réalisé)) +
+  geom_point() +
+  geom_smooth()
+hist(lm_lambda_somme$residuals, breaks=10)
+qqnorm(lm_lambda_somme$residuals)
+qqline(lm_lambda_somme$residuals)
+# shapiro.test(lm_lambda_somme$residuals)
+# mean(lm_lambda_somme$residuals)
+##Lambda 
+x <- test_seuil_lambdaa$Somme_temperature_jour
+y <- test_seuil_lambdaa$Lambda
+plot(x,y)
+abline(lm(y ~ x), col="red", lty=2)
+lm_lambda_somme <- lm(y~x)
+summary(lm_lambda_somme)
+plot(lm_lambda_somme$residuals)
+abline(h=0,col="blue")
+ggplot(test_seuil_lambdaa, aes(Somme_temperature_jour,Lambda)) +
+  geom_point() +
+  geom_smooth()
+hist(lm_lambda_somme$residuals, breaks=10)
+qqnorm(lm_lambda_somme$residuals)
+qqline(lm_lambda_somme$residuals)
+# shapiro.test(lm_lambda_somme$residuals)
+# mean(lm_lambda_somme$residuals)
+#Année i-1
+
+## Lambda réalisé
+x <- test_seuil_lambda_$Somme_temperature_jour
+y <- test_seuil_lambda_$Lambda_réalisé
+plot(x,y)
+abline(lm(y ~ x), col="red", lty=2)
+lm_lambda_somme <- lm(y~x)
+summary(lm_lambda_somme)
+plot(lm_lambda_somme$residuals)
+abline(h=0,col="blue")
+ggplot(test_seuil_lambda_, aes(Somme_temperature_jour,Lambda_réalisé)) +
+  geom_point() +
+  geom_smooth()
+hist(lm_lambda_somme$residuals, breaks=10)
+qqnorm(lm_lambda_somme$residuals)
+qqline(lm_lambda_somme$residuals)
+# shapiro.test(lm_lambda_somme$residuals)
+# mean(lm_lambda_somme$residuals)
+##Lambda 
+x <- test_seuil_lambdaa_$Somme_temperature_jour
+y <- test_seuil_lambdaa_$Lambda
+plot(x,y)
+abline(lm(y ~ x), col="red", lty=2)
+lm_lambda_somme <- lm(y~x)
+summary(lm_lambda_somme)
+plot(lm_lambda_somme$residuals)
+abline(h=0,col="blue")
+ggplot(test_seuil_lambdaa_, aes(Somme_temperature_jour,Lambda)) +
+  geom_point() +
+  geom_smooth()
+hist(lm_lambda_somme$residuals, breaks=10)
+qqnorm(lm_lambda_somme$residuals)
+qqline(lm_lambda_somme$residuals)
+# shapiro.test(lm_lambda_somme$residuals)
+# mean(lm_lambda_somme$residuals)
+```
+
+#régression avec seuil 10
+```{r}
+#Année i
+
+## Lambda réalisé
+x <- test_seuil_lambda$Seuil_10
+y <- test_seuil_lambda$Lambda_réalisé
+plot(x,y)
+abline(lm(y ~ x), col="red", lty=2)
+lm_lambda_somme <- lm(y~x)
+summary(lm_lambda_somme)
+plot(lm_lambda_somme$residuals)
+abline(h=0,col="blue")
+ggplot(test_seuil_lambda, aes(Seuil_10,Lambda_réalisé)) +
+  geom_point() +
+  geom_smooth()
+hist(lm_lambda_somme$residuals, breaks=10)
+# shapiro.test(lm_lambda_somme$residuals)
+# mean(lm_lambda_somme$residuals)
+
+##Lambda 
+x <- test_seuil_lambdaa$Seuil_10
+y <- test_seuil_lambdaa$Lambda
+plot(x,y)
+abline(lm(y ~ x), col="red", lty=2)
+lm_lambda_somme <- lm(y~x)
+summary(lm_lambda_somme)
+plot(lm_lambda_somme$residuals)
+abline(h=0,col="blue")
+ggplot(test_seuil_lambdaa, aes(Seuil_10,Lambda)) +
+  geom_point() +
+  geom_smooth()
+hist(lm_lambda_somme$residuals, breaks=10)
+# shapiro.test(lm_lambda_somme$residuals)
+# mean(lm_lambda_somme$residuals)
+#Année i-1
+
+## Lambda réalisé
+x <- test_seuil_lambda_$Seuil_10
+y <- test_seuil_lambda_$Lambda_réalisé
+plot(x,y)
+abline(lm(y ~ x), col="red", lty=2)
+lm_lambda_somme <- lm(y~x)
+summary(lm_lambda_somme)
+plot(lm_lambda_somme$residuals)
+abline(h=0,col="blue")
+ggplot(test_seuil_lambda_, aes(Seuil_10,Lambda_réalisé)) +
+  geom_point() +
+  geom_smooth()
+hist(lm_lambda_somme$residuals, breaks=10)
+# shapiro.test(lm_lambda_somme$residuals)
+# mean(lm_lambda_somme$residuals)
+
+##Lambda
+x <- test_seuil_lambdaa_$Seuil_10
+y <- test_seuil_lambdaa_$Lambda
+plot(x,y)
+abline(lm(y ~ x), col="red", lty=2)
+lm_lambda_somme <- lm(y~x)
+summary(lm_lambda_somme)
+plot(lm_lambda_somme$residuals)
+abline(h=0,col="blue")
+ggplot(test_seuil_lambdaa_, aes(Seuil_10,Lambda)) +
+  geom_point() +
+  geom_smooth()
+hist(lm_lambda_somme$residuals, breaks=10)
+# shapiro.test(lm_lambda_somme$residuals)
+# mean(lm_lambda_somme$residuals)
+```
+
+#régression avec seuil 15
+```{r}
+#Année i
+
+## Lambda réalisé
+x <- test_seuil_lambda$Seuil_15
+y <- test_seuil_lambda$Lambda_réalisé
+plot(x,y)
+abline(lm(y ~ x), col="red", lty=2)
+lm_lambda_somme <- lm(y~x)
+summary(lm_lambda_somme)
+plot(lm_lambda_somme$residuals)
+abline(h=0,col="blue")
+ggplot(test_seuil_lambda, aes(Seuil_15,Lambda_réalisé)) +
+  geom_point() +
+  geom_smooth()
+hist(lm_lambda_somme$residuals, breaks=10)
+
+##Lambda 
+x <- test_seuil_lambdaa$Seuil_15
+y <- test_seuil_lambdaa$Lambda
+plot(x,y)
+abline(lm(y ~ x), col="red", lty=2)
+lm_lambda_somme <- lm(y~x)
+summary(lm_lambda_somme)
+plot(lm_lambda_somme$residuals)
+abline(h=0,col="blue")
+ggplot(test_seuil_lambdaa, aes(Seuil_15,Lambda)) +
+  geom_point() +
+  geom_smooth()
+hist(lm_lambda_somme$residuals, breaks=10)
+#Année i-1
+
+## Lambda réalisé
+x <- test_seuil_lambda_$Seuil_15
+y <- test_seuil_lambda_$Lambda_réalisé
+plot(x,y)
+abline(lm(y ~ x), col="red", lty=2)
+lm_lambda_somme <- lm(y~x)
+summary(lm_lambda_somme)
+plot(lm_lambda_somme$residuals)
+abline(h=0,col="blue")
+ggplot(test_seuil_lambda_, aes(Seuil_15,Lambda_réalisé)) +
+  geom_point() +
+  geom_smooth()
+hist(lm_lambda_somme$residuals, breaks=10)
+##Lambda
+x <- test_seuil_lambdaa_$Seuil_15
+y <- test_seuil_lambdaa_$Lambda
+plot(x,y)
+abline(lm(y ~ x), col="red", lty=2)
+lm_lambda_somme <- lm(y~x)
+summary(lm_lambda_somme)
+plot(lm_lambda_somme$residuals)
+abline(h=0,col="blue")
+ggplot(test_seuil_lambdaa_, aes(Seuil_15,Lambda)) +
+  geom_point() +
+  geom_smooth()
+hist(lm_lambda_somme$residuals, breaks=10)
+```
+
+
+## Test pour voir quel mois influence le plus le lambda annuel
+par mois:
+```{r}
+
+l <- length(donnees_jour_split)
+somme_t_j_m = 0
+
+k <- c(nrow(donnees_jour_split[[1]]),nrow(donnees_jour_split[[2]]),nrow(donnees_jour_split[[3]]),nrow(donnees_jour_split[[4]]),nrow(donnees_jour_split[[5]]),nrow(donnees_jour_split[[6]]),nrow(donnees_jour_split[[7]]))
+df_somme_an <- data.frame()
+annees <- c("2013", "2014", "2015", "2016", "2017", "2018", "2019")
+a <- length(annees)
+m <- length(mois)
+ori <- c()
+i = 1
+j = 1
+h = 1
+g=1
+somme_m <- c()
+month <- c()
+year <- c()
+for (i in 1:l) {
+  #boucle du milieu
+  origine <- c()
+  origine <- c(origine, names(donnees_jour_split[i]))
+  g = 1
+  for (g in 1:a) {
+    h = 1
+    for (h in 1:m) {
+      for (j in 1:k[i]) {
+        if (format(donnees_jour_split[[i]]$day[j], "%Y") == annees[g]) {
+          if (donnees_jour_split[[i]]$data_moy[j] > 0 &
+              format(donnees_jour_split[[i]]$day[j], "%m") == mois[h]) {
+            somme_t_j_m <- somme_t_j_m + donnees_jour_split[[i]]$data_moy[j]
+          }
+        }
+      }
+      ori <- c(ori, origine)
+      somme_m <- c(somme_m, somme_t_j_m)
+      somme_t_j_m <- 0
+      month <- c(month, mois[h])
+      year <- c(year, annees[g])
+    }
+    
+  }
+}
+df_somme_mois <- data.frame(ori, somme_m, month, year)
+
+```
+
+En prenant l'année en cours: (année i)
+```{r}
+
+
+origine <- c(rep.int("BER", time =7),rep.int("BOU", time =7),rep.int("DES", time =7),rep.int("PRA", time =7),rep.int("PRB", time =7),rep.int("PRC", time =7),rep.int("PRD", time =7))
+
+
+m_mois <- matrix(somme, ncol = 49, nrow = 10)
+rownames(m_mois) <- c('Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre','Octobre','Novembre','Décembre')
+tab_m_mois <- as.data.frame.matrix(m_mois)
+tab_mois <- t(tab_m_mois)
+tab_mois <-cbind(tab_mois, origine, rep.int(c("2013","2014","2015","2016","2017","2018","2019"), time = 7))
+tab_mois <- as.data.frame(tab_mois)
+tab_mois <- tab_mois[-c(1,7,8,14,15,21,22,28,29,35,36,42,43,49),]
+tab_mois <- cbind(tab_mois,lambda,lambdar)
+tab_mois <- as.data.frame(tab_mois)
+names(tab_mois)[12] <- "Année"
+names(tab_mois)[13] <- "Lambda"
+names(tab_mois)[14] <- "Lambda_réalisé"
+
+  
+tab_mois <- tab_mois[-25,]
+
+
+```
+
+```{r}
+tab_mois$Mars <- as.numeric(tab_mois$Mars)
+tab_mois$Avril <- as.numeric(tab_mois$Avril)
+tab_mois$Mai <- as.numeric(tab_mois$Mai)
+tab_mois$Juin <- as.numeric(tab_mois$Juin)
+tab_mois$Juillet <- as.numeric(tab_mois$Juillet)
+tab_mois$Août <- as.numeric(tab_mois$Août)
+tab_mois$Septembre <- as.numeric(tab_mois$Septembre)
+tab_mois$Octobre <- as.numeric(tab_mois$Octobre)
+tab_mois$Novembre <- as.numeric(tab_mois$Novembre)
+tab_mois$Décembre <- as.numeric(tab_mois$Décembre)
+tab_mois_split <- split(tab_mois, f= tab_mois$origine)
+```
+
+#avec lambda
+
+```{r}
+# cor.test(tab_mois_split$BER$Mars,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Avril,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Mai,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Juin,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Juillet,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Août,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Septembre,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Octobre,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Novembre,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Décembre,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+```
+
+```{r}
+#cor.test(tab_mois_split$BOU$Mars,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Avril,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Mai,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Juin,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Juillet,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Août,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Septembre,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Octobre,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Novembre,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Décembre,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+```
+
+```{r}
+cor.test(tab_mois_split$DES$Mars,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Avril,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Mai,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Juin,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Juillet,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Août,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Septembre,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Octobre,tab_mois_split$DES$Lambda, method = "spearman", exact = F)      #
+cor.test(tab_mois_split$DES$Novembre,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Décembre,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+```
+
+```{r}
+cor.test(tab_mois_split$PRA$Mars,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Avril,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Mai,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Juin,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)    #
+cor.test(tab_mois_split$PRA$Juillet,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Août,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Septembre,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Octobre,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Novembre,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Décembre,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)
+```
+
+```{r}
+# cor.test(tab_mois_split$PRB$Mars,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRB$Avril,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRB$Mai,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRB$Juin,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRB$Juillet,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRB$Août,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRB$Septembre,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRB$Octobre,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRB$Novembre,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRB$Décembre,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+```
+
+```{r}
+cor.test(tab_mois_split$PRC$Mars,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRC$Avril,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRC$Mai,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)    #
+cor.test(tab_mois_split$PRC$Juin,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRC$Juillet,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)   #
+cor.test(tab_mois_split$PRC$Août,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRC$Septembre,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRC$Octobre,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRC$Novembre,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRC$Décembre,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)
+```
+```{r}
+cor.test(tab_mois_split$PRD$Mars,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRD$Avril,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRD$Mai,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRD$Juin,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRD$Juillet,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRD$Août,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)   #
+cor.test(tab_mois_split$PRD$Septembre,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRD$Octobre,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRD$Novembre,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRD$Décembre,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)
+```
+
+```{r}
+plot(tab_mois_split$DES$Octobre, tab_mois_split$DES$Lambda)
+```
+
+
+# Avec lambda réalisé
+
+
+```{r}
+# cor.test(tab_mois_split$BER$Mars,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Avril,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Mai,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Juin,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Juillet,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Août,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Septembre,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Octobre,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Novembre,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Décembre,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+```
+
+```{r}
+#cor.test(tab_mois_split$BOU$Mars,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Avril,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Mai,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Juin,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Juillet,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Août,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Septembre,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Octobre,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Novembre,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Décembre,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+```
+
+```{r}
+cor.test(tab_mois_split$DES$Mars,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Avril,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Mai,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Juin,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Juillet,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)  #
+cor.test(tab_mois_split$DES$Août,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Septembre,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Octobre,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Novembre,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Décembre,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)
+```
+
+```{r}
+cor.test(tab_mois_split$PRA$Mars,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Avril,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Mai,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Juin,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Juillet,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Août,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Septembre,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Octobre,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)  #
+cor.test(tab_mois_split$PRA$Novembre,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Décembre,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)
+```
+
+```{r}
+cor.test(tab_mois_split$PRB$Mars,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Avril,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)  #
+cor.test(tab_mois_split$PRB$Mai,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Juin,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Juillet,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Août,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Septembre,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Octobre,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Novembre,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Décembre,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)
+```
+
+```{r}
+# cor.test(tab_mois_split$PRC$Mars,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Avril,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Mai,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Juin,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Juillet,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Août,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Septembre,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Octobre,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Novembre,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Décembre,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+```
+```{r}
+# cor.test(tab_mois_split$PRD$Mars,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRD$Avril,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRD$Mai,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRD$Juin,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRD$Juillet,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRD$Août,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRD$Septembre,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRD$Octobre,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRD$Novembre,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRD$Décembre,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+```
+
+```{r}
+plot(tab_mois_split$DES$Octobre, tab_mois_split$DES$Lambda_réalisé)
+```
+En prenant l'année d'avant: (année i-1)
+```{r}
+
+
+origine <- c(rep.int("BER", time =7),rep.int("BOU", time =7),rep.int("DES", time =7),rep.int("PRA", time =7),rep.int("PRB", time =7),rep.int("PRC", time =7),rep.int("PRD", time =7))
+
+
+m_mois <- matrix(somme, ncol = 49, nrow = 10)
+rownames(m_mois) <- c('Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre','Octobre','Novembre','Décembre')
+tab_m_mois <- as.data.frame.matrix(m_mois)
+tab_mois <- t(tab_m_mois)
+tab_mois <-cbind(tab_mois, origine, rep.int(c("2013","2014","2015","2016","2017","2018","2019"), time = 7))
+tab_mois <- as.data.frame(tab_mois)
+tab_mois <- tab_mois[-c(6,7,13,14,20,21,27,28,34,35,41,42,48,49),]
+tab_mois <- cbind(tab_mois,lambda,lambdar)
+tab_mois <- as.data.frame(tab_mois)
+names(tab_mois)[12] <- "Année"
+names(tab_mois)[13] <- "Lambda"
+names(tab_mois)[14] <- "Lambda_réalisé"
+
+tab_mois <- tab_mois[-c(1,6,11,16,21,26,31),]
+
+
+```
+
+```{r}
+tab_mois$Mars <- as.numeric(tab_mois$Mars)
+tab_mois$Avril <- as.numeric(tab_mois$Avril)
+tab_mois$Mai <- as.numeric(tab_mois$Mai)
+tab_mois$Juin <- as.numeric(tab_mois$Juin)
+tab_mois$Juillet <- as.numeric(tab_mois$Juillet)
+tab_mois$Août <- as.numeric(tab_mois$Août)
+tab_mois$Septembre <- as.numeric(tab_mois$Septembre)
+tab_mois$Octobre <- as.numeric(tab_mois$Octobre)
+tab_mois$Novembre <- as.numeric(tab_mois$Novembre)
+tab_mois$Décembre <- as.numeric(tab_mois$Décembre)
+tab_mois_split <- split(tab_mois, f= tab_mois$origine)
+```
+
+#avec lambda
+
+```{r}
+cor.test(tab_mois_split$BER$Mars,tab_mois_split$BER$Lambda, method = "spearman", exact = F)     #
+cor.test(tab_mois_split$BER$Avril,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$BER$Mai,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$BER$Juin,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$BER$Juillet,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$BER$Août,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$BER$Septembre,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$BER$Octobre,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$BER$Novembre,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$BER$Décembre,tab_mois_split$BER$Lambda, method = "spearman", exact = F)
+```
+
+```{r}
+# cor.test(tab_mois_split$BOU$Mars,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Avril,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Mai,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Juin,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Juillet,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Août,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Septembre,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Octobre,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Novembre,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Décembre,tab_mois_split$BOU$Lambda, method = "spearman", exact = F)
+```
+
+```{r}
+# cor.test(tab_mois_split$DES$Mars,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$DES$Avril,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$DES$Mai,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$DES$Juin,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$DES$Juillet,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$DES$Août,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$DES$Septembre,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$DES$Octobre,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$DES$Novembre,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$DES$Décembre,tab_mois_split$DES$Lambda, method = "spearman", exact = F)
+```
+
+```{r}
+cor.test(tab_mois_split$PRA$Mars,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)    #
+cor.test(tab_mois_split$PRA$Avril,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Mai,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Juin,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)    
+cor.test(tab_mois_split$PRA$Juillet,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Août,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Septembre,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Octobre,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)       #
+cor.test(tab_mois_split$PRA$Novembre,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Décembre,tab_mois_split$PRA$Lambda, method = "spearman", exact = F)
+```
+
+```{r}
+cor.test(tab_mois_split$PRB$Mars,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Avril,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Mai,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Juin,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Juillet,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Août,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Septembre,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)     #
+cor.test(tab_mois_split$PRB$Octobre,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Novembre,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Décembre,tab_mois_split$PRB$Lambda, method = "spearman", exact = F)
+```
+
+```{r}
+# cor.test(tab_mois_split$PRC$Mars,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Avril,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Mai,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)    
+# cor.test(tab_mois_split$PRC$Juin,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Juillet,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)   
+# cor.test(tab_mois_split$PRC$Août,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Septembre,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Octobre,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Novembre,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Décembre,tab_mois_split$PRC$Lambda, method = "spearman", exact = F)
+```
+```{r}
+# cor.test(tab_mois_split$PRD$Mars,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRD$Avril,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRD$Mai,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRD$Juin,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRD$Juillet,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRD$Août,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)   #
+# cor.test(tab_mois_split$PRD$Septembre,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRD$Octobre,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRD$Novembre,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRD$Décembre,tab_mois_split$PRD$Lambda, method = "spearman", exact = F)
+```
+
+```{r}
+plot(tab_mois_split$DES$Octobre, tab_mois_split$DES$Lambda)
+```
+
+
+# Avec lambda réalisé
+
+
+```{r}
+# cor.test(tab_mois_split$BER$Mars,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Avril,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Mai,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Juin,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Juillet,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Août,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Septembre,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Octobre,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Novembre,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BER$Décembre,tab_mois_split$BER$Lambda_réalisé, method = "spearman", exact = F)
+```
+
+```{r}
+#cor.test(tab_mois_split$BOU$Mars,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Avril,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Mai,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Juin,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Juillet,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Août,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Septembre,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Octobre,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Novembre,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$BOU$Décembre,tab_mois_split$BOU$Lambda_réalisé, method = "spearman", exact = F)
+```
+
+```{r}
+cor.test(tab_mois_split$DES$Mars,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Avril,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)   #
+cor.test(tab_mois_split$DES$Mai,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Juin,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Juillet,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)  
+cor.test(tab_mois_split$DES$Août,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Septembre,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Octobre,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$DES$Novembre,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)      #
+cor.test(tab_mois_split$DES$Décembre,tab_mois_split$DES$Lambda_réalisé, method = "spearman", exact = F)
+```
+
+```{r}
+cor.test(tab_mois_split$PRA$Mars,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Avril,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Mai,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Juin,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Juillet,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Août,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Septembre,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRA$Octobre,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)  
+cor.test(tab_mois_split$PRA$Novembre,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)  #
+cor.test(tab_mois_split$PRA$Décembre,tab_mois_split$PRA$Lambda_réalisé, method = "spearman", exact = F)
+```
+
+```{r}
+cor.test(tab_mois_split$PRB$Mars,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Avril,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)  #
+cor.test(tab_mois_split$PRB$Mai,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Juin,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Juillet,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Août,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Septembre,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)   #
+cor.test(tab_mois_split$PRB$Octobre,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Novembre,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRB$Décembre,tab_mois_split$PRB$Lambda_réalisé, method = "spearman", exact = F)
+```
+
+```{r}
+# cor.test(tab_mois_split$PRC$Mars,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Avril,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Mai,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Juin,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Juillet,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Août,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Septembre,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Octobre,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Novembre,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+# cor.test(tab_mois_split$PRC$Décembre,tab_mois_split$PRC$Lambda_réalisé, method = "spearman", exact = F)
+```
+```{r}
+cor.test(tab_mois_split$PRD$Mars,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRD$Avril,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRD$Mai,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRD$Juin,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)       #
+cor.test(tab_mois_split$PRD$Juillet,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRD$Août,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRD$Septembre,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRD$Octobre,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRD$Novembre,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+cor.test(tab_mois_split$PRD$Décembre,tab_mois_split$PRD$Lambda_réalisé, method = "spearman", exact = F)
+```
+
+
+
+```{r}
+library("writexl")
+write_xlsx(df_somme_an, path = "GDD.xlsx")
+write_xlsx(res_seuil_10, path = "Seuil_10.xlsx")
+write_xlsx(res_seuil_15, path = "Seuil_15.xlsx")
+write_xlsx(PRA, path = "PRA.xlsx")
+write_xlsx(PRB, path = "PRB.xlsx")
+write_xlsx(PRC, path = "PRC.xlsx")
+write_xlsx(PRD, path = "PRD.xlsx")
+write_xlsx(BER, path = "BER.xlsx")
+write_xlsx(BOU, path = "BOU.xlsx")
+write_xlsx(DES, path = "DES.xlsx")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
