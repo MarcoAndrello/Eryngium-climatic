@@ -2,7 +2,11 @@ rm(list=ls())
 
 library(tidyverse)
 library(readxl)
-library(here)
+# library(alookr)
+library(caret)
+library(corrgram)
+library(lme4)
+library(nlme)
 
 site.name <- c("Boujurian","Deslioures","Bernards","PraloA","PraloB","PraloC","PraloD")
 
@@ -71,7 +75,7 @@ for (i.site in 1 : 7) {
   # Concatenate dataframes
   if (i.site == 1) data.surv <- bb3 else data.surv <- rbind(data.surv,bb3)
 }
-rm(ind,yJ,firstF,b,bb,bb1,bb2,bb3)
+rm(a,ind,yJ,firstF,b,bb,bb1,bb2,bb3)
 
 ## remove NA and define factors
 data.surv <- na.omit(data.surv)
@@ -83,32 +87,38 @@ data.surv$State <- factor(data.surv$State)
 data.surv$fateSurv <- factor(data.surv$fateSurv)
 summary(data.surv)
 
-# Explanatory variables: ibutton-derived variables
-# Read iButton data
-v.site.ib <- c("DES","BER","BOU","PRA","PRB","PRC","PRD")
-i.site <- 1
-for (i.site in 1 : 7) {
-    data.ib <- read_xlsx(paste0(getwd(),"/Julie Chaumont 2022/",v.site.ib[i.site],".xlsx"))
-    
-    data.ib %>%
-        # Concatenate date and heure column and convert it into lubridate::datetime
-        mutate(dati = as_datetime(paste(data.ib$date, data.ib$heure), tz="Europe/Paris")) %>%
-        # Keep only after 2013
-        filter(dati >"2014-01-01 00:00:00") %>%
-        # Delete unnecessary columns
-        select(-c(date, heure, V2, source)) -> 
-        data.ib
-    
-    data.ib %>%
-        # Group by day
-        group_by(DATE = as_date(dati)) %>%
-        # Calculate minimal, mean and maximal daily temperature
-        summarise(iTmin = min(temp), iTmean=mean(temp), iTmax=max(temp)) ->
-        idata # i-Button data
-}
+save(data.surv,file="data.surv.RData")
 
-#### MI FERMO QUI. ANDARE AVANTI, CALCOLARE LE VARIABILI PER ANNO (DDAYS, TEMP MEDIE MARZO, APRILE, MAGGIO, GIUGNO ETC, NUMERO GIORNI DI FILA CON TEMP ALTE, TEMP BASSE ETC
-### VEDERE SCRIPT IMPUTATION PER CODICE
+
+
+
+# Statistical model: GLMM
+# Scale predictors
+data[,c("ddays_4","ddays_5","meanT_6","num_s_Tmin_10","num_s_Tmin_15","num_s_Tmax_30")] <- 
+    scale(data[,c("ddays_4","ddays_5","meanT_6","num_s_Tmin_10","num_s_Tmin_15","num_s_Tmax_30")])
+m1 <- glm(fateSurv ~ State*Site*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30), data=data, family=binomial)
+m1 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30) + (1 | Site), data=data, family=binomial)
+m2 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30) + (1 | Site) + (1 | ID), data=data, family=binomial)
+m2 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30) + (1 | Site) + (1 | ID), data=data, family=binomial, nAGQ=0)
+AIC(m1,m2)
+m3 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30) + (1 + ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30 | Site) + (1 | ID), data=data, family=binomial, nAGQ=0)
+m4 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30) + (0 + ddays_5+meanT_6+num_s_Tmin_15+num_s_Tmax_30 | Site) + (1 | ID), data=data, family=binomial, nAGQ=0)
+m5 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30) + (0 + meanT_6+num_s_Tmax_30 | Site) + (1 | ID), data=data, family=binomial, nAGQ=0)
+m6.1 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30) + (0 + meanT_6 | Site) + (1 | ID), data=data, family=binomial, nAGQ=0)
+m6.2 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30) + (0 + num_s_Tmax_30 | Site) + (1 | ID), data=data, family=binomial, nAGQ=0)
+m6.11 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30) + (0 + meanT_6 | Site) + (1 | ID), data=data, family=binomial, nAGQ=1)
+AIC(m3,m4,m5,m6.1,m6.2)
+summary(m6.1)
+
+m6.1.1 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6) + (0 + meanT_6 | Site) + (1 | ID), data=data, family=binomial, nAGQ=0)
+m6.1.2 <- glmer(fateSurv ~ State*(ddays_5+meanT_6) + (0 + meanT_6 | Site) + (1 | ID), data=data, family=binomial, nAGQ=0)
+summary(m6.1.2)
+AIC(m6.1, m6.1.1, m6.1.2)
+
+library(sjPlot)
+plot_model(m6.1, type="re")
+### rifare mettendo sito in fisso e state in fisso e la loro interazione!
+# e poi in interazione con i predittori climatici! e sceglierne di migliori!
 
 
 # # analysis Bernoulli model, explanatory var: site * state * year
