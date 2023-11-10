@@ -88,10 +88,9 @@ for (i.site in 1 : 7) {
 rm(data.ib,idata)
 # SI POTREBBE AGGIUNGERE ALTRE SOGLIE (5 GIORNI INVECE DI 3 ETC) E ADDIZIONARE LE TEMPERATURE COME JULIE CHAUMONT
 
-
 xvar <- bind_rows(xvar)
 
-# remove highly correlated variables
+# remove correlated variables
 xvar %>% select(-c(Year,Site)) %>%
     cor(method="spearman",use = "na.or.complete") %>%
     findCorrelation(names=T,cutoff=0.5) -> var_names_toRemove
@@ -99,53 +98,48 @@ var_names_toRemove
 xvar %>% select(!all_of(var_names_toRemove)) -> xvar_1
 # Plot correlations
 corrgram(xvar_1 %>% select(-c(Year, Site)),cor.method="spearman",upper.panel=panel.cor, lower.panel=panel.pts)
+# tolgo anchge tmax30 e tmin10. per avere solo 2 variabili.
+# poi vedremo di calcolare meglio una variabile di stress termico/drough, magari integrando anche i dati di piogge di safran
+xvar_1 %>% select(-c(num_s_Tmin_10, num_s_Tmax_30)) -> xvar_1
+summary(xvar_1)
+xvar_1$Year <- factor(xvar_1$Year)
+xvar_1$Site <- factor(xvar_1$Site)
+save(xvar_1,file="xvar_1.RData")
+
 
 ### MI FERMO QUI
 
 
-# Create dataframe of ddays for each month, per year
-idata %>% group_by(year,month) %>% summarise(ddays = calc.ddays(iTmean)) %>% pivot_wider(names_from=month, values_from=ddays) -> ddays
-# Create dataframe of mean Temperature for each month, per year
-idata %>% group_by(year,month) %>% summarise(meanT = mean(iTmean)) %>% pivot_wider(names_from=month, values_from=meanT) -> meanT
-# Create dataframe of number of stress period per year (number of periods with more than 3 "hot" consecutive days; "hot" defined in 4 ways)
-idata %>% filter(month %in% c(6,7,8)) %>% mutate(s_Tmin_10 = ifelse(iTmin > 10,1,0),
-                                                 s_Tmin_15 = ifelse(iTmin > 15,1,0),
-                                                 s_Tmax_25 = ifelse(iTmax > 25,1,0),
-                                                 s_Tmax_30 = ifelse(iTmax > 30,1,0)) %>% 
-    group_by(year) %>% summarise(num_s_Tmin_10 = calc.num_stress_periods(s_Tmin_10),
-                                 num_s_Tmin_15 = calc.num_stress_periods(s_Tmin_15),
-                                 num_s_Tmax_25 = calc.num_stress_periods(s_Tmax_25),
-                                 num_s_Tmax_30 = calc.num_stress_periods(s_Tmax_30)) -> num_s
-# Join the three dataframes
-ddays %>% left_join(meanT,by="year",suffix=c(".ddays",".meanT")) %>% left_join(num_s,by="year") %>% mutate(site=v.site.ib[i.site]) -> xvar[[i.site]]
 
 
 
-
-
-xvar %>% bind_rows %>% ungroup -> xvar
-# remove winter months
-xvar %>% select(-c("1.ddays","2.ddays","3.ddays","9.ddays","10.ddays","11.ddays","12.ddays",
-                   "1.meanT","2.meanT","3.meanT","9.meanT","10.meanT","11.meanT","12.meanT")) -> xvar
-# remove highly correlated variables
-xvar %>% select(-c(year,site)) %>%
-    cor(method="spearman",use = "na.or.complete") %>%
-    findCorrelation(names=T,cutoff=0.5) -> var_names_toRemove
-var_names_toRemove
-xvar %>% select(!all_of(var_names_toRemove)) -> xvar_1
-# Plot correlations
-corrgram(xvar_1 %>% select(-year),cor.method="spearman",upper.panel=panel.cor)
-save(xvar_1,file="xvar_1.RData")
-
-# Join demographic and environmental dataset
-data.surv_1 <- data.surv
-data.surv_1$Site <- plyr::mapvalues(data.surv$Site,levels(data.surv$Site),c("BER","BOU","DES","PRA","PRB","PRC","PRD"))
-xvar_1$site <- factor(xvar_1$site, levels(data.surv_1$Site))
-xvar_1$year <- factor(xvar_1$year, levels(data.surv_1$Year))
-left_join(data.surv_1, xvar_1, by=c("Site" = "site", "Year" = "year")) %>% filter(Year %in% c(2014:2021)) -> data
-
-data <- na.omit(data)
-names(data)
-names(data)[c(9,10,11)] <- c("ddays_4", "ddays_5", "meanT_6")
-
-
+# # OLD VARIABLES
+# # Create dataframe of ddays for each month, per year
+# idata %>% group_by(year,month) %>% summarise(ddays = calc.ddays(iTmean)) %>% pivot_wider(names_from=month, values_from=ddays) -> ddays
+# # Create dataframe of mean Temperature for each month, per year
+# idata %>% group_by(year,month) %>% summarise(meanT = mean(iTmean)) %>% pivot_wider(names_from=month, values_from=meanT) -> meanT
+# # Create dataframe of number of stress period per year (number of periods with more than 3 "hot" consecutive days; "hot" defined in 4 ways)
+# idata %>% filter(month %in% c(6,7,8)) %>% mutate(s_Tmin_10 = ifelse(iTmin > 10,1,0),
+#                                                  s_Tmin_15 = ifelse(iTmin > 15,1,0),
+#                                                  s_Tmax_25 = ifelse(iTmax > 25,1,0),
+#                                                  s_Tmax_30 = ifelse(iTmax > 30,1,0)) %>% 
+#     group_by(year) %>% summarise(num_s_Tmin_10 = calc.num_stress_periods(s_Tmin_10),
+#                                  num_s_Tmin_15 = calc.num_stress_periods(s_Tmin_15),
+#                                  num_s_Tmax_25 = calc.num_stress_periods(s_Tmax_25),
+#                                  num_s_Tmax_30 = calc.num_stress_periods(s_Tmax_30)) -> num_s
+# # Join the three dataframes
+# ddays %>% left_join(meanT,by="year",suffix=c(".ddays",".meanT")) %>% left_join(num_s,by="year") %>% mutate(site=v.site.ib[i.site]) -> xvar[[i.site]]
+# xvar %>% bind_rows %>% ungroup -> xvar
+# # remove winter months
+# xvar %>% select(-c("1.ddays","2.ddays","3.ddays","9.ddays","10.ddays","11.ddays","12.ddays",
+#                    "1.meanT","2.meanT","3.meanT","9.meanT","10.meanT","11.meanT","12.meanT")) -> xvar
+# # remove highly correlated variables
+# xvar %>% select(-c(year,site)) %>%
+#     cor(method="spearman",use = "na.or.complete") %>%
+#     findCorrelation(names=T,cutoff=0.5) -> var_names_toRemove
+# var_names_toRemove
+# xvar %>% select(!all_of(var_names_toRemove)) -> xvar_1
+# # Plot correlations
+# corrgram(xvar_1 %>% select(-year),cor.method="spearman",upper.panel=panel.cor)
+# save(xvar_1,file="xvar_1.RData")
+# 

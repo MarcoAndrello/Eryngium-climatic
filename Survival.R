@@ -2,11 +2,7 @@ rm(list=ls())
 
 library(tidyverse)
 library(readxl)
-# library(alookr)
-library(caret)
-library(corrgram)
-library(lme4)
-library(nlme)
+library(sjPlot)
 
 site.name <- c("Boujurian","Deslioures","Bernards","PraloA","PraloB","PraloC","PraloD")
 
@@ -86,37 +82,33 @@ data.surv$Year <- factor(data.surv$Year)
 data.surv$State <- factor(data.surv$State)
 data.surv$fateSurv <- factor(data.surv$fateSurv)
 summary(data.surv)
-
+data.surv$Site <- plyr::mapvalues(data.surv$Site,levels(data.surv$Site),c("BER","BOU","DES","PRA","PRB","PRC","PRD"))
 save(data.surv,file="data.surv.RData")
 
 
-
+# Join demographic and environmental dataset
+load("xvar_1.RData")
+left_join(data.surv, xvar_1, by=c("Site", "Year")) %>% filter(Year %in% c(2014:2021)) -> data
+data <- na.omit(data)
+data
 
 # Statistical model: GLMM
 # Scale predictors
-data[,c("ddays_4","ddays_5","meanT_6","num_s_Tmin_10","num_s_Tmin_15","num_s_Tmax_30")] <- 
-    scale(data[,c("ddays_4","ddays_5","meanT_6","num_s_Tmin_10","num_s_Tmin_15","num_s_Tmax_30")])
-m1 <- glm(fateSurv ~ State*Site*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30), data=data, family=binomial)
-m1 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30) + (1 | Site), data=data, family=binomial)
-m2 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30) + (1 | Site) + (1 | ID), data=data, family=binomial)
-m2 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30) + (1 | Site) + (1 | ID), data=data, family=binomial, nAGQ=0)
-AIC(m1,m2)
-m3 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30) + (1 + ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30 | Site) + (1 | ID), data=data, family=binomial, nAGQ=0)
-m4 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30) + (0 + ddays_5+meanT_6+num_s_Tmin_15+num_s_Tmax_30 | Site) + (1 | ID), data=data, family=binomial, nAGQ=0)
-m5 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30) + (0 + meanT_6+num_s_Tmax_30 | Site) + (1 | ID), data=data, family=binomial, nAGQ=0)
-m6.1 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30) + (0 + meanT_6 | Site) + (1 | ID), data=data, family=binomial, nAGQ=0)
-m6.2 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30) + (0 + num_s_Tmax_30 | Site) + (1 | ID), data=data, family=binomial, nAGQ=0)
-m6.11 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6+num_s_Tmin_10+num_s_Tmin_15+num_s_Tmax_30) + (0 + meanT_6 | Site) + (1 | ID), data=data, family=binomial, nAGQ=1)
-AIC(m3,m4,m5,m6.1,m6.2)
-summary(m6.1)
+data[,c("ddays", "num_s_Tmin_15")] <- scale(data[,c("ddays", "num_s_Tmin_15")])
+summary(data)
+# Preliminary analysis without random terms
+m0 <- glm(fateSurv ~ State*Site*(ddays+num_s_Tmin_15), data=data, family=binomial)
+m1 <- glmer(fateSurv ~ State*Site*(ddays+num_s_Tmin_15) + (1 | ID), data=data, family=binomial, nAGQ=0)
+AIC(m0,m1)
+m2 <- glm(fateSurv ~ State*Site + State*(ddays+num_s_Tmin_15), data=data, family=binomial)
+m3 <- glm(fateSurv ~ State*Site + (ddays+num_s_Tmin_15), data=data, family=binomial)
+m4 <- glm(fateSurv ~ State+Site + (ddays+num_s_Tmin_15), data=data, family=binomial)
+AIC(m0,m1,m2,m3,m4)
+summary(m3)
+plot_model(m3,type="pred",terms=c("ddays"))
+plot_model(m3,type="pred",terms=c("num_s_Tmin_15"))
+plot_model(m3,type="pred",terms=c("State","Site"))
 
-m6.1.1 <- glmer(fateSurv ~ State*(ddays_4+ddays_5+meanT_6) + (0 + meanT_6 | Site) + (1 | ID), data=data, family=binomial, nAGQ=0)
-m6.1.2 <- glmer(fateSurv ~ State*(ddays_5+meanT_6) + (0 + meanT_6 | Site) + (1 | ID), data=data, family=binomial, nAGQ=0)
-summary(m6.1.2)
-AIC(m6.1, m6.1.1, m6.1.2)
-
-library(sjPlot)
-plot_model(m6.1, type="re")
 ### rifare mettendo sito in fisso e state in fisso e la loro interazione!
 # e poi in interazione con i predittori climatici! e sceglierne di migliori!
 
