@@ -89,6 +89,9 @@ rm(data.ib,idata)
 # SI POTREBBE AGGIUNGERE ALTRE SOGLIE (5 GIORNI INVECE DI 3 ETC) E ADDIZIONARE LE TEMPERATURE COME JULIE CHAUMONT
 
 xvar <- bind_rows(xvar)
+xvar$Year <- factor(xvar$Year)
+xvar$Site <- factor(xvar$Site)
+save(xvar,file="xvar.RData") # per provare il BCF
 
 # remove correlated variables
 xvar %>% select(-c(Year,Site)) %>%
