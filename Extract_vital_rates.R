@@ -20,13 +20,12 @@ for (i.site in 1 : 7) {
   rm(id.repro.1)
   
   # Populate ID numbers for those not having it
-  which(is.na(a$num_2005))
+  # which(is.na(a$num_2005))
   a$num_2005[which(is.na(a$num_2005))] <- paste0("nn",1 : length(which(is.na(a$num_2005))))
   # a$num_2005
   
   # Define unique ID: sitequad-num_2005
   a$ID <- paste0(a$quadrat,"-",a$num_2005)
-  
   
   # Sometimes non-flowering adults (4) were incorrectly scored as juveniles (3) in the field, and vice-versa
   # The criterion is: juvenile has never flowered; non-flowering has flowered at least once.
@@ -65,14 +64,20 @@ for (i.site in 1 : 7) {
   # filter out 6,NA on state (keep only 3,4 and 5)
   bb1 %>% filter(State %in% c(3,4,5)) -> bb2
   
-  # survival: fate 3,4,5 = 1 and 6 = 0
+  # survival: fate 3,4,5 = 1; fate 6 = 0
   bb2 %>% mutate(fateSurv = case_when(Fate %in% c(3,4,5) ~ 1,
-                                      Fate == 6 ~ 0)) -> bb3
+                                      Fate == 6 ~ 0)) -> bb_surv
+  
+  # flowering: fate 5 = 1; fate 3,4 = 0; fate 6 = 0 (effectively NA)
+  bb2 %>% mutate(fateFlow = case_when(Fate == 5 ~ 1,
+                                      Fate == 6 ~ NA,
+                                      Fate %in% c(3,4,6) ~ 0)) -> bb_flow
   
   # Concatenate dataframes
-  if (i.site == 1) data.surv <- bb3 else data.surv <- rbind(data.surv,bb3)
+  if (i.site == 1) data.surv <- bb_surv else data.surv <- rbind(data.surv,bb_surv)
+  if (i.site == 1) data.flow <- bb_flow else data.flow <- rbind(data.flow,bb_flow)
 }
-rm(a,ind,yJ,firstF,b,bb,bb1,bb2,bb3)
+rm(a,ind,yJ,firstF,b,bb,bb1,bb2,bb_surv, bb_flow)
 
 ## remove NA and define factors
 data.surv <- na.omit(data.surv)
@@ -86,4 +91,15 @@ summary(data.surv)
 data.surv$Site <- plyr::mapvalues(data.surv$Site,levels(data.surv$Site),c("BER","BOU","DES","PRA","PRB","PRC","PRD"))
 save(data.surv,file="data.surv.RData")
 
+## remove NA and define factors
+data.flow <- na.omit(data.flow)
+data.flow$Site <- factor(data.flow$Site)
+data.flow$Quad <- factor(data.flow$Quad)
+data.flow$ID <- factor(data.flow$ID)
+data.flow$Year <- factor(data.flow$Year)
+data.flow$State <- factor(data.flow$State)
+data.flow$fateFlow <- factor(data.flow$fateFlow)
+summary(data.flow)
+data.flow$Site <- plyr::mapvalues(data.flow$Site,levels(data.flow$Site),c("BER","BOU","DES","PRA","PRB","PRC","PRD"))
+save(data.flow,file="data.flow.RData")
 

@@ -20,6 +20,15 @@ calc.num_stress_periods <- function(x) {
     rle.year <- rle(x) 
     length(which(rle.year$length[which(rle.year$values==1)]>3))
 }
+calc.num_stress_days <- function(x) {
+    rle.year <- rle(x) 
+    # Number of days in each stressful period
+    num_days_stressful_periods <- rle.year$length[which(rle.year$values==1)]
+    # Number of days in each stressful period that is longer than 3 days
+    num_days_stressful_period_above_thr_length <- num_days_stressful_periods[which(num_days_stressful_periods>3)]
+    #Total number of days in stressful periods
+    sum(num_days_stressful_period_above_thr_length)
+}
 
 
 xvar <- list()
@@ -78,20 +87,24 @@ for (i.site in 1 : 7) {
         idata_annual %>%
             summarise(Year = 2013+i.year,
                       ddays = calc.ddays(iTmean),
-                      num_s_Tmin_10 = calc.num_stress_periods(s_Tmin_10),
-                      num_s_Tmin_15 = calc.num_stress_periods(s_Tmin_15),
-                      num_s_Tmax_25 = calc.num_stress_periods(s_Tmax_25),
-                      num_s_Tmax_30 = calc.num_stress_periods(s_Tmax_30)) -> ivar_annual_temp[[i.year]]
+                      num_sp_Tmin_10 = calc.num_stress_periods(s_Tmin_10),
+                      num_sp_Tmin_15 = calc.num_stress_periods(s_Tmin_15),
+                      num_sp_Tmax_25 = calc.num_stress_periods(s_Tmax_25),
+                      num_sp_Tmax_30 = calc.num_stress_periods(s_Tmax_30),
+                      num_sd_Tmin_10 = calc.num_stress_days(s_Tmin_10),
+                      num_sd_Tmin_15 = calc.num_stress_days(s_Tmin_15),
+                      num_sd_Tmax_25 = calc.num_stress_days(s_Tmax_25),
+                      num_sd_Tmax_30 = calc.num_stress_days(s_Tmax_30)) -> ivar_annual_temp[[i.year]]
     }
     bind_rows(ivar_annual_temp) %>% mutate(Site = v.site.ib[i.site]) -> xvar[[i.site]]
 }
 rm(data.ib,idata)
-# SI POTREBBE AGGIUNGERE ALTRE SOGLIE (5 GIORNI INVECE DI 3 ETC) E ADDIZIONARE LE TEMPERATURE COME JULIE CHAUMONT
+# SI POTREBBE AGGIUNGERE ALTRE SOGLIE (5 GIORNI INVECE DI 3 ETC) 
 
 xvar <- bind_rows(xvar)
 xvar$Year <- factor(xvar$Year)
 xvar$Site <- factor(xvar$Site)
-save(xvar,file="xvar.RData") # per provare il BCF
+save(xvar,file="xvar.RData") # per provare il BRT
 
 # remove correlated variables
 xvar %>% select(-c(Year,Site)) %>%

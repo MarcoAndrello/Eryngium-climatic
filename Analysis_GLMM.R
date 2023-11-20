@@ -6,6 +6,7 @@ library(tidyverse)
 library(lme4)
 library(sjPlot)
 
+# SURVIVAL
 # Join demographic and environmental dataset
 load("data.surv.RData")
 load("xvar_1.RData")
@@ -22,16 +23,73 @@ m0 <- glm(fateSurv ~ State*Site*(ddays+num_s_Tmin_15), data=data, family=binomia
 m1 <- glmer(fateSurv ~ State*Site*(ddays+num_s_Tmin_15) + (1 | ID), data=data, family=binomial, nAGQ=0)
 AIC(m0,m1)
 m2 <- glm(fateSurv ~ State*Site + State*(ddays+num_s_Tmin_15), data=data, family=binomial)
+m21 <- glm(fateSurv ~ State*Site + Site*(ddays+num_s_Tmin_15), data=data, family=binomial)
 m3 <- glm(fateSurv ~ State*Site + (ddays+num_s_Tmin_15), data=data, family=binomial)
 m4 <- glm(fateSurv ~ State+Site + (ddays+num_s_Tmin_15), data=data, family=binomial)
 AIC(m0,m1,m2,m3,m4)
+
 summary(m3)
+plot(m3)
+# Diagnostica: ci sono molti residui negativi a causa di valori fittati altissimi
+infl <- influence(m3,do.coef=F)
+data[which(infl$hat > 0.04),] %>% print(n=100)
+data[which(m3$linear.predictors > 10),] %>% print(n=100)
+
+
 plot_model(m3,type="pred",terms=c("ddays"))
 plot_model(m3,type="pred",terms=c("num_s_Tmin_15"))
 plot_model(m3,type="pred",terms=c("State","Site"))
 
 ### rifare mettendo sito in fisso e state in fisso e la loro interazione!
 # e poi in interazione con i predittori climatici! e sceglierne di migliori!
+
+
+
+
+# FLOWERING
+# Join demographic and environmental dataset
+load("data.flow.RData")
+load("xvar.RData")
+left_join(data.flow, xvar, by=c("Site", "Year")) %>% filter(Year %in% c(2014:2021)) -> data
+data <- na.omit(data)
+data
+
+# Statistical model: GLMM
+# Scale predictors
+data[,c("ddays", "num_sd_Tmin_10", "num_sp_Tmin_10","num_sd_Tmax_25", "num_sp_Tmax_25")] <-
+    scale(data[,c("ddays", "num_sd_Tmin_10", "num_sp_Tmin_10","num_sd_Tmax_25", "num_sp_Tmax_25")])
+
+summary(data)
+# Preliminary analysis without random terms
+m0 <- glm(fateFlow ~ State*Site*(ddays+num_sd_Tmin_10+num_sp_Tmin_10+num_sd_Tmax_25+num_sp_Tmax_25), data=data, family=binomial)
+m1 <- glmer(fateFlow ~ State*Site*(ddays+num_sd_Tmin_10+num_sp_Tmin_10+num_sd_Tmax_25+num_sp_Tmax_25) + (1 | ID), data=data, family=binomial, nAGQ=0)
+AIC(m0,m1)
+m2 <- glm(fateFlow ~ State*Site + State*(ddays+num_sd_Tmin_10+num_sp_Tmin_10+num_sd_Tmax_25+num_sp_Tmax_25), data=data, family=binomial)
+m21 <- glm(fateFlow ~ State*Site + Site*(ddays+num_sd_Tmin_10+num_sp_Tmin_10+num_sd_Tmax_25+num_sp_Tmax_25), data=data, family=binomial)
+m3 <- glm(fateFlow ~ State*Site + (ddays+num_sd_Tmin_10+num_sp_Tmin_10+num_sd_Tmax_25+num_sp_Tmax_25), data=data, family=binomial)
+m4 <- glm(fateFlow ~ State+Site + (ddays+num_sd_Tmin_10+num_sp_Tmin_10+num_sd_Tmax_25+num_sp_Tmax_25), data=data, family=binomial)
+AIC(m0,m1,m2,m21,m3,m4)
+
+summary(m21)
+plot(m21)
+# Diagnostica: ci sono molti residui negativi a causa di valori fittati altissimi
+
+
+plot_model(m21,type="pred",terms=c("ddays"))
+plot_model(m21,type="pred",terms=c("num_sd_Tmin_10"))
+plot_model(m21,type="pred",terms=c("num_sp_Tmin_10"))
+plot_model(m21,type="pred",terms=c("num_sd_Tmax_25"))
+plot_model(m21,type="pred",terms=c("num_sp_Tmax_25"))
+plot_model(m21,type="pred",terms=c("num_sd_Tmax_25","num_sp_Tmax_25"))
+plot_model(m21,type="pred",terms=c("num_sp_Tmax_25","State"))
+plot_model(m21,type="pred",terms=c("num_sp_Tmax_25","Site"))
+plot_model(m21,type="pred",terms=c("State","Site"))
+
+### rifare mettendo sito in fisso e state in fisso e la loro interazione!
+# e poi in interazione con i predittori climatici! e sceglierne di migliori!
+
+
+
 
 
 # # analysis Bernoulli model, explanatory var: site * state * year
