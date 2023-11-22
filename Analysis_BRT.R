@@ -9,6 +9,7 @@ library(cvms)
 library(caret)
 library(Matrix)
 library(data.table)
+library(DiagrammeR)
 
 # # Join demographic and environmental dataset
 # ## Survival
@@ -64,6 +65,7 @@ xgb_model <- xgb.train(
     verbose = 1
 )
 xgb_model
+save(xgb_model,file="xgb.model_flow.RData")
 
 # Variable importance
 importance_matrix <- xgb.importance(
@@ -72,6 +74,8 @@ importance_matrix <- xgb.importance(
 )
 importance_matrix
 xgb.plot.importance(importance_matrix)
+
+xgb.plot.tree(model=xgb_model, trees=0)
 
 # Predict on the test subsample
 xgb_preds <- predict(xgb_model, as.matrix(X_test), reshape = TRUE)
